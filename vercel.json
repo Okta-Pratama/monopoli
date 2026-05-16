@@ -1,14 +1,15 @@
 {
   "builds": [
     {
-      "src": "api/**/*.php",
-      "use": "vercel-php@0.6.1"
+      "src": "app/index.php",
+      "use": "vercel-community/php"
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "/api/index.php"
+      "source": "/(.*)",
+      "destination": "/app/index.php"
     }
-  ]
+  ],
+  "cleanUrls": true
 }
