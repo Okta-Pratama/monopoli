@@ -1,0 +1,10 @@
+- optimize uang, uang start harga rumah, harga hotel dan harga tanah
+- sesi aksi dilakukan hanya 1mnt
+- tambahkan maskot bank
+- tombol Ok diwaktu pergantian pemain
+- dipenjara dadu 6
+- aktif player
+- player stars
+- setiap putaran melewati start dapat uang
+- optimize tampilan 1920x1080
+- responsive untuk device 1920x1080, mini laptop, laptop, phone
