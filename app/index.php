@@ -16,7 +16,7 @@ session_start();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <link rel="stylesheet" href="../src/styles/main.css">
+    <link rel="stylesheet" href="/src/styles/main.css">
 </head>
 <body>
 
@@ -56,7 +56,7 @@ session_start();
             else if ($petak['tipe'] === 'bandara') $iconClass = 'fa-plane';
             else if ($petak['tipe'] === 'utilitas') $iconClass = 'fa-lightbulb';
         ?>
-            <div class="tile tile-<?= $index ?> <?= $petak['tipe'] ?>" id="tile-<?= $index ?>" onclick="handleTileClick(<?= $index ?>)" style="background-image: url('../public/images/tiles/<?= $index ?>.png');">
+            <div class="tile tile-<?= $index ?> <?= $petak['tipe'] ?>" id="tile-<?= $index ?>" onclick="handleTileClick(<?= $index ?>)" style="background-image: url('/public/images/tiles/<?= $index ?>.png');">
                 <i class="fa-solid <?= $iconClass ?> fallback-icon"></i>
                 <div class="tile-overlay"></div>
                 <div class="house-indicator" id="houses-<?= $index ?>"></div>
@@ -125,13 +125,13 @@ session_start();
     </div>
 </div>
 
-<script src="../src/script/state.js"></script>
-<script src="../src/script/ui.js"></script>
-<script src="../src/script/cards.js"></script>
-<script src="../src/script/property.js"></script>
-<script src="../src/script/jail.js"></script>
-<script src="../src/script/turn.js"></script>
-<script src="../src/script/main.js"></script>
+<script src="/src/script/state.js"></script>
+<script src="/src/script/ui.js"></script>
+<script src="/src/script/cards.js"></script>
+<script src="/src/script/property.js"></script>
+<script src="/src/script/jail.js"></script>
+<script src="/src/script/turn.js"></script>
+<script src="/src/script/main.js"></script>
 
 </body>
 </html>
