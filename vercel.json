@@ -2,7 +2,7 @@
   "builds": [
     {
       "src": "app/index.php",
-      "use": "vercel-community/php"
+      "use": "vercel-php@0.9.0"
     }
   ],
   "rewrites": [
