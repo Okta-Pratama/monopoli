@@ -3,8 +3,9 @@
 - tambahkan maskot bank
 - tombol Ok diwaktu pergantian pemain
 - dipenjara dadu 6
-- aktif player
-- player stars
+- aktif player kurang jelas
+- player star, jika melakukan kesalahan maka player mendapatkan bintang apabila bintang sudah penuh 3, maka akan dipenjara, untuk indikator bintang ada di sebelah kanan nama player
+- design ulang sertifikat player, design sertifikat kiri nama sertifikat atau nama tempatnya, lalu di kanan button inspeksi mata, lalu dibawahnya deskripsi ini tanah kosong atau ada berapa rumah, atau hotel
 - setiap putaran melewati start dapat uang
 - optimize tampilan 1920x1080
 - responsive untuk device 1920x1080, mini laptop, laptop, phone

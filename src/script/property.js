@@ -31,7 +31,7 @@ function viewOtherProperty(tileIndex, buyerId) {
     let sellerId = tile.owner;
     let html = `Milik: <b>Player ${sellerId + 1}</b><br>Sewa Dasar: <b>${formatRp(tile.sewa)}</b><br>
                 Rumah: <b>${tile.houses < 5 ? (tile.houses || 0) : 0}</b> | Hotel: <b>${tile.houses === 5 ? 1 : 0}</b><br><br>
-                <button class="btn btn-info w-100 fw-bold text-white" onclick="offerProperty(${buyerId}, ${sellerId}, ${tileIndex})"><i class="fa-solid fa-handshake"></i> Tawar Tanah</button>`;
+                <button class="btn btn-info fw-bold text-white" onclick="offerProperty(${buyerId}, ${sellerId}, ${tileIndex})"><i class="fa-solid fa-handshake"></i> Tawar Tanah</button>`;
     Swal.fire({ title: tile.nama, html: html, showCancelButton: true, cancelButtonText: 'Tutup', showConfirmButton: false });
 }
 
@@ -43,21 +43,21 @@ function openPropertyMenu(ownerId, tileIndex) {
 
     if (tile.mortgaged) {
         let tebusCost = (tile.harga / 2) * 1.1;
-        htmlOpts += `<button class="btn btn-success m-2 w-100 fw-bold" onclick="unmortgage(${ownerId}, ${tileIndex}, ${tebusCost})"><i class="fa-solid fa-unlock"></i> Tebus Sertifikat (${formatRp(tebusCost)})</button>`;
+        htmlOpts += `<button class="btn btn-success m-2 fw-bold" onclick="unmortgage(${ownerId}, ${tileIndex}, ${tebusCost})"><i class="fa-solid fa-unlock"></i> Tebus Sertifikat (${formatRp(tebusCost)})</button>`;
     } else {
         if (checkMonopolyGroup(ownerId, tile.grup) && tile.tipe === 'properti' && (!tile.houses || tile.houses < 5)) {
-            htmlOpts += `<button class="btn btn-primary m-2 w-100 fw-bold" onclick="buildHouse(${ownerId}, ${tileIndex})"><i class="fa-solid fa-hammer"></i> Bangun Properti (${formatRp(50)})</button>`;
+            htmlOpts += `<button class="btn btn-primary m-2 fw-bold" onclick="buildHouse(${ownerId}, ${tileIndex})"><i class="fa-solid fa-hammer"></i> Bangun Properti (${formatRp(50)})</button>`;
         }
         
         if (tile.houses > 0) {
             if (tile.houses === 5) {
-                htmlOpts += `<button class="btn btn-danger m-2 w-100 fw-bold" onclick="sellHotel(${ownerId}, ${tileIndex})"><i class="fa-solid fa-building"></i> Jual Hotel (+${formatRp(25)})</button>`;
+                htmlOpts += `<button class="btn btn-danger m-2 fw-bold" onclick="sellHotel(${ownerId}, ${tileIndex})"><i class="fa-solid fa-building"></i> Jual Hotel (+${formatRp(25)})</button>`;
             } else {
-                htmlOpts += `<button class="btn btn-warning m-2 w-100 fw-bold" onclick="sellHouse(${ownerId}, ${tileIndex})"><i class="fa-solid fa-house"></i> Jual Rumah (+${formatRp(25)})</button>`;
+                htmlOpts += `<button class="btn btn-warning m-2 fw-bold" onclick="sellHouse(${ownerId}, ${tileIndex})"><i class="fa-solid fa-house"></i> Jual Rumah (+${formatRp(25)})</button>`;
             }
         } else {
             let gadaiGain = tile.harga / 2;
-            htmlOpts += `<button class="btn btn-danger m-2 w-100 fw-bold" onclick="mortgage(${ownerId}, ${tileIndex}, ${gadaiGain})"><i class="fa-solid fa-lock"></i> Gadaikan (+${formatRp(gadaiGain)})</button>`;
+            htmlOpts += `<button class="btn btn-danger m-2 fw-bold" onclick="mortgage(${ownerId}, ${tileIndex}, ${gadaiGain})"><i class="fa-solid fa-lock"></i> Gadaikan (+${formatRp(gadaiGain)})</button>`;
         }
     }
     Swal.fire({ title: tile.nama, html: htmlOpts, showCancelButton: true, cancelButtonText: 'Tutup', showConfirmButton: false });
