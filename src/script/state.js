@@ -30,12 +30,13 @@ function playSfx(sound) {
 // ========== PLAYER & GAME STATE ==========
 const pColors = ['text-player-0', 'text-player-1', 'text-player-2', 'text-player-3'];
 const pBgSoft = ['#fef2f2', '#eff6ff', '#ecfdf5', '#fffbeb'];
+const pNames  = ['Player 1', 'Player 2', 'Player 3', 'Player 4'];
 
 let players = [
-    { id: 0, pos: 0, money: 1500, properties: [], cards: [], wrongAnswers: 0, inJail: false, jailTurns: 0, isBankrupt: false },
-    { id: 1, pos: 0, money: 1500, properties: [], cards: [], wrongAnswers: 0, inJail: false, jailTurns: 0, isBankrupt: false },
-    { id: 2, pos: 0, money: 1500, properties: [], cards: [], wrongAnswers: 0, inJail: false, jailTurns: 0, isBankrupt: false },
-    { id: 3, pos: 0, money: 1500, properties: [], cards: [], wrongAnswers: 0, inJail: false, jailTurns: 0, isBankrupt: false }
+    { id: 0, pos: 0, money: 3000, properties: [], cards: [], stars: 0, inJail: false, jailTurns: 0, isBankrupt: false },
+    { id: 1, pos: 0, money: 3000, properties: [], cards: [], stars: 0, inJail: false, jailTurns: 0, isBankrupt: false },
+    { id: 2, pos: 0, money: 3000, properties: [], cards: [], stars: 0, inJail: false, jailTurns: 0, isBankrupt: false },
+    { id: 3, pos: 0, money: 3000, properties: [], cards: [], stars: 0, inJail: false, jailTurns: 0, isBankrupt: false }
 ];
 
 let currentTurn = 0;
@@ -45,3 +46,5 @@ let isActionPhase = true;
 let hasRolled = false;
 let autoRollInterval;
 let rollCountdown = 3;
+let actionTimerInterval;
+let actionCountdown = 60;

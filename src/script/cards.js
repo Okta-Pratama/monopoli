@@ -27,8 +27,10 @@ function triggerStatsQuestion(p, tileIndex) {
         allowOutsideClick: false,
         confirmButtonText: 'Kunci Jawaban'
     }).then((res) => {
-        if (res.value.toLowerCase() == q.jawaban_kunci.toLowerCase()) {
-            p.wrongAnswers = 0;
+        if (res.value && res.value.toLowerCase() == q.jawaban_kunci.toLowerCase()) {
+            // Jawaban benar — reset stars
+            p.stars = 0;
+            updateStarIndicator(p.id);
             Swal.fire({
                 title: 'Tepat!',
                 text: `Reward ${formatRp(q.poin)} akan masuk saldo. Beli ${tile.nama} seharga ${formatRp(tile.harga)}?`,
@@ -53,9 +55,19 @@ function triggerStatsQuestion(p, tileIndex) {
                 }
             });
         } else {
-            p.wrongAnswers++;
-            if (p.wrongAnswers >= 3) {
-                Swal.fire('Salah 3x!', 'Masuk Penjara!', 'error').then(() => {
+            // Jawaban salah — tambah bintang
+            p.stars++;
+            updateStarIndicator(p.id);
+
+            if (p.stars >= 3) {
+                Swal.fire({
+                    title: '⭐⭐⭐ Tiga Bintang!',
+                    html: `<div style="font-size:1.1rem;">Jawaban salah sudah <b>3x</b>!<br>Kamu <b>masuk penjara</b>! 🚔</div>`,
+                    icon: 'error',
+                    confirmButtonText: 'Masuk Penjara!'
+                }).then(() => {
+                    p.stars = 0;
+                    updateStarIndicator(p.id);
                     p.pos = 10;
                     p.inJail = true;
                     p.jailTurns = 0;
@@ -64,9 +76,13 @@ function triggerStatsQuestion(p, tileIndex) {
                     updateUI();
                 });
             } else {
+                const starDisplay = '⭐'.repeat(p.stars) + '☆'.repeat(3 - p.stars);
                 Swal.fire({
                     title: 'Salah!',
-                    text: `Jawaban: ${q.jawaban_kunci}. Peringatan: ${p.wrongAnswers}/3.\nTetap ingin membeli ${tile.nama} seharga ${formatRp(tile.harga)}?`,
+                    html: `<div>Jawaban benar: <b>${q.jawaban_kunci}</b></div>
+                           <div style="font-size:1.5rem; margin: 10px 0;">${starDisplay}</div>
+                           <div style="font-size:0.85rem; color:#e74c3c;">Peringatan: ${p.stars}/3 — Di bintang ke-3 kamu masuk penjara!</div>
+                           <br><div>Tetap ingin membeli <b>${tile.nama}</b> seharga <b>${formatRp(tile.harga)}</b>?</div>`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Beli',
@@ -136,7 +152,7 @@ function drawCard(type, p) {
         }
         updateUI();
         if (p.money < 0) {
-            hasRolled = true; // force end turn state to handle debt
+            hasRolled = true;
             Swal.fire('Hutang!', 'Uangmu minus, segera jual aset untuk membayar hutang!', 'warning');
             updateUI();
         }

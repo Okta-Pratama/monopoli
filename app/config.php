@@ -4,6 +4,8 @@
  * File ini berisi semua konfigurasi, variable, dan konstanta untuk game Monopoli
  */
 
+// ========== KONFIGURASI UMUM ==========
+$startMoney = 3000;
 
 // ========== PERTANYAAN & SOAL ==========
 $questions = [
@@ -55,45 +57,45 @@ function formatRp($val) {
 // ========== BOARD DATA ==========
 $board = [
     0 => ['tipe' => 'corner', 'nama' => 'START', 'warna' => '#e8e8eb', 'harga' => 0],
-    1 => ['tipe' => 'properti', 'nama' => 'Bekasi', 'grup' => $c_coklat, 'harga' => 60, 'sewa' => 2],
+    1 => ['tipe' => 'properti', 'nama' => 'Bekasi', 'grup' => $c_coklat, 'harga' => 80, 'sewa' => 4],
     2 => ['tipe' => 'dana_umum', 'nama' => 'Dana Umum', 'warna' => '#fff', 'harga' => 0],
-    3 => ['tipe' => 'properti', 'nama' => 'Tangerang', 'grup' => $c_coklat, 'harga' => 60, 'sewa' => 4],
+    3 => ['tipe' => 'properti', 'nama' => 'Tangerang', 'grup' => $c_coklat, 'harga' => 80, 'sewa' => 6],
     4 => ['tipe' => 'pajak', 'nama' => 'Kena Tilang', 'warna' => '#fff', 'harga' => 200], 
-    5 => ['tipe' => 'bandara', 'nama' => 'Stasiun Gambir', 'warna' => '#ccc', 'harga' => 200],
-    6 => ['tipe' => 'properti', 'nama' => 'Bogor', 'grup' => $c_biru_muda, 'harga' => 100, 'sewa' => 6],
+    5 => ['tipe' => 'bandara', 'nama' => 'Stasiun Gambir', 'warna' => '#ccc', 'harga' => 250],
+    6 => ['tipe' => 'properti', 'nama' => 'Bogor', 'grup' => $c_biru_muda, 'harga' => 120, 'sewa' => 8],
     7 => ['tipe' => 'kesempatan', 'nama' => 'Kesempatan', 'warna' => '#fff', 'harga' => 0],
-    8 => ['tipe' => 'properti', 'nama' => 'Depok', 'grup' => $c_biru_muda, 'harga' => 100, 'sewa' => 6],
-    9 => ['tipe' => 'properti', 'nama' => 'Gresik', 'grup' => $c_biru_muda, 'harga' => 120, 'sewa' => 8],
+    8 => ['tipe' => 'properti', 'nama' => 'Depok', 'grup' => $c_biru_muda, 'harga' => 120, 'sewa' => 8],
+    9 => ['tipe' => 'properti', 'nama' => 'Gresik', 'grup' => $c_biru_muda, 'harga' => 140, 'sewa' => 10],
     10 => ['tipe' => 'corner', 'nama' => 'Penjara', 'warna' => '#e8e8eb', 'harga' => 0],
-    11 => ['tipe' => 'properti', 'nama' => 'Sidoarjo', 'grup' => $c_pink, 'harga' => 140, 'sewa' => 10],
-    12 => ['tipe' => 'utilitas', 'nama' => 'Perpustakaan', 'warna' => '#fff', 'harga' => 150],
-    13 => ['tipe' => 'properti', 'nama' => 'Malang', 'grup' => $c_pink, 'harga' => 140, 'sewa' => 10],
-    14 => ['tipe' => 'properti', 'nama' => 'Solo', 'grup' => $c_pink, 'harga' => 160, 'sewa' => 12],
-    15 => ['tipe' => 'bandara', 'nama' => 'Band. Juanda', 'warna' => '#ccc', 'harga' => 200],
-    16 => ['tipe' => 'properti', 'nama' => 'Semarang', 'grup' => $c_orange, 'harga' => 180, 'sewa' => 14],
+    11 => ['tipe' => 'properti', 'nama' => 'Sidoarjo', 'grup' => $c_pink, 'harga' => 160, 'sewa' => 12],
+    12 => ['tipe' => 'utilitas', 'nama' => 'Perpustakaan', 'warna' => '#fff', 'harga' => 180],
+    13 => ['tipe' => 'properti', 'nama' => 'Malang', 'grup' => $c_pink, 'harga' => 160, 'sewa' => 12],
+    14 => ['tipe' => 'properti', 'nama' => 'Solo', 'grup' => $c_pink, 'harga' => 180, 'sewa' => 14],
+    15 => ['tipe' => 'bandara', 'nama' => 'Band. Juanda', 'warna' => '#ccc', 'harga' => 250],
+    16 => ['tipe' => 'properti', 'nama' => 'Semarang', 'grup' => $c_orange, 'harga' => 200, 'sewa' => 16],
     17 => ['tipe' => 'dana_umum', 'nama' => 'Dana Umum', 'warna' => '#fff', 'harga' => 0],
-    18 => ['tipe' => 'properti', 'nama' => 'Yogyakarta', 'grup' => $c_orange, 'harga' => 180, 'sewa' => 14],
-    19 => ['tipe' => 'properti', 'nama' => 'Bandung', 'grup' => $c_orange, 'harga' => 200, 'sewa' => 16],
+    18 => ['tipe' => 'properti', 'nama' => 'Yogyakarta', 'grup' => $c_orange, 'harga' => 200, 'sewa' => 16],
+    19 => ['tipe' => 'properti', 'nama' => 'Bandung', 'grup' => $c_orange, 'harga' => 220, 'sewa' => 18],
     20 => ['tipe' => 'corner', 'nama' => 'Bebas Parkir', 'warna' => '#e8e8eb', 'harga' => 0],
-    21 => ['tipe' => 'properti', 'nama' => 'Surabaya', 'grup' => $c_merah, 'harga' => 220, 'sewa' => 18],
+    21 => ['tipe' => 'properti', 'nama' => 'Surabaya', 'grup' => $c_merah, 'harga' => 240, 'sewa' => 20],
     22 => ['tipe' => 'kesempatan', 'nama' => 'Kesempatan', 'warna' => '#fff', 'harga' => 0],
-    23 => ['tipe' => 'properti', 'nama' => 'Denpasar', 'grup' => $c_merah, 'harga' => 220, 'sewa' => 18],
-    24 => ['tipe' => 'properti', 'nama' => 'Mataram', 'grup' => $c_merah, 'harga' => 240, 'sewa' => 20],
-    25 => ['tipe' => 'bandara', 'nama' => 'B. Ngurah Rai', 'warna' => '#ccc', 'harga' => 200],
-    26 => ['tipe' => 'properti', 'nama' => 'Makassar', 'grup' => $c_kuning, 'harga' => 260, 'sewa' => 22],
-    27 => ['tipe' => 'properti', 'nama' => 'Manado', 'grup' => $c_kuning, 'harga' => 260, 'sewa' => 22],
-    28 => ['tipe' => 'utilitas', 'nama' => 'Lab Komputer', 'warna' => '#fff', 'harga' => 150],
-    29 => ['tipe' => 'properti', 'nama' => 'Balikpapan', 'grup' => $c_kuning, 'harga' => 280, 'sewa' => 24],
+    23 => ['tipe' => 'properti', 'nama' => 'Denpasar', 'grup' => $c_merah, 'harga' => 240, 'sewa' => 20],
+    24 => ['tipe' => 'properti', 'nama' => 'Mataram', 'grup' => $c_merah, 'harga' => 260, 'sewa' => 22],
+    25 => ['tipe' => 'bandara', 'nama' => 'B. Ngurah Rai', 'warna' => '#ccc', 'harga' => 250],
+    26 => ['tipe' => 'properti', 'nama' => 'Makassar', 'grup' => $c_kuning, 'harga' => 280, 'sewa' => 24],
+    27 => ['tipe' => 'properti', 'nama' => 'Manado', 'grup' => $c_kuning, 'harga' => 280, 'sewa' => 24],
+    28 => ['tipe' => 'utilitas', 'nama' => 'Lab Komputer', 'warna' => '#fff', 'harga' => 180],
+    29 => ['tipe' => 'properti', 'nama' => 'Balikpapan', 'grup' => $c_kuning, 'harga' => 300, 'sewa' => 26],
     30 => ['tipe' => 'corner', 'nama' => 'Masuk Penjara!', 'warna' => '#e8e8eb', 'harga' => 0],
-    31 => ['tipe' => 'properti', 'nama' => 'Samarinda', 'grup' => $c_hijau, 'harga' => 300, 'sewa' => 26],
-    32 => ['tipe' => 'properti', 'nama' => 'Pontianak', 'grup' => $c_hijau, 'harga' => 300, 'sewa' => 26],
+    31 => ['tipe' => 'properti', 'nama' => 'Samarinda', 'grup' => $c_hijau, 'harga' => 320, 'sewa' => 28],
+    32 => ['tipe' => 'properti', 'nama' => 'Pontianak', 'grup' => $c_hijau, 'harga' => 320, 'sewa' => 28],
     33 => ['tipe' => 'dana_umum', 'nama' => 'Dana Umum', 'warna' => '#fff', 'harga' => 0],
-    34 => ['tipe' => 'properti', 'nama' => 'Banjarmasin', 'grup' => $c_hijau, 'harga' => 320, 'sewa' => 28],
-    35 => ['tipe' => 'bandara', 'nama' => 'B. Kualanamu', 'warna' => '#ccc', 'harga' => 200],
+    34 => ['tipe' => 'properti', 'nama' => 'Banjarmasin', 'grup' => $c_hijau, 'harga' => 340, 'sewa' => 30],
+    35 => ['tipe' => 'bandara', 'nama' => 'B. Kualanamu', 'warna' => '#ccc', 'harga' => 250],
     36 => ['tipe' => 'kesempatan', 'nama' => 'Kesempatan', 'warna' => '#fff', 'harga' => 0],
-    37 => ['tipe' => 'properti', 'nama' => 'Palembang', 'grup' => $c_biru_tua, 'harga' => 350, 'sewa' => 35],
+    37 => ['tipe' => 'properti', 'nama' => 'Palembang', 'grup' => $c_biru_tua, 'harga' => 380, 'sewa' => 35],
     38 => ['tipe' => 'pajak', 'nama' => 'Bayar PBB', 'warna' => '#fff', 'harga' => 100], 
-    39 => ['tipe' => 'properti', 'nama' => 'Medan', 'grup' => $c_biru_tua, 'harga' => 400, 'sewa' => 50]
+    39 => ['tipe' => 'properti', 'nama' => 'Medan', 'grup' => $c_biru_tua, 'harga' => 450, 'sewa' => 50]
 ];
 
 ?>

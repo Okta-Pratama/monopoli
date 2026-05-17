@@ -10,10 +10,26 @@ function processTurn() {
 
     if (p.inJail) {
         let hasJailCard = p.cards.find(c => c.type === 'free_jail');
-        let jailOpts = `<button class="btn btn-warning m-1 fw-bold" onclick="payJail(${p.id})">Bayar ${formatRp(50)}</button>`;
-        if (hasJailCard) jailOpts += `<button class="btn btn-info m-1 fw-bold" onclick="useJailCard(${p.id})">Pakai Kartu</button>`;
-        jailOpts += `<br><button class="btn btn-danger m-1 mt-2 fw-bold" onclick="skipJailTurn(${p.id})">Lewati Giliran</button>`;
-        Swal.fire({ title: 'Terkurung di Penjara!', html: jailOpts, showConfirmButton: false, allowOutsideClick: false });
+        let jailOpts = `
+            <div style="display:flex; flex-direction:column; gap:10px; padding:10px;">
+                <button class="btn btn-warning fw-bold" onclick="payJail(${p.id})" style="border-radius:12px; padding:12px;">
+                    <i class="fa-solid fa-money-bill-wave me-2"></i>Bayar Denda ${formatRp(50)}
+                </button>
+                <button class="btn btn-primary fw-bold" onclick="rollDiceJail(${p.id})" style="border-radius:12px; padding:12px;">
+                    <i class="fa-solid fa-dice me-2"></i>Kocok Dadu (Butuh angka 6!)
+                </button>
+                ${hasJailCard ? `<button class="btn btn-info fw-bold text-white" onclick="useJailCard(${p.id})" style="border-radius:12px; padding:12px;"><i class="fa-solid fa-ticket me-2"></i>Pakai Kartu Bebas</button>` : ''}
+                <button class="btn btn-outline-danger fw-bold mt-2" onclick="skipJailTurn(${p.id})" style="border-radius:12px; padding:12px;">
+                    <i class="fa-solid fa-forward me-2"></i>Lewati Giliran (${p.jailTurns}/2)
+                </button>
+            </div>`;
+        Swal.fire({
+            title: '<i class="fa-solid fa-bars-staggered me-2"></i>Terkurung di Penjara!',
+            html: jailOpts,
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            customClass: { popup: 'swal-jail-popup' }
+        });
     } else {
         rollAndMove(p);
     }
@@ -44,16 +60,17 @@ function rollAndMove(p) {
                     Swal.fire({
                         toast: true,
                         position: 'top-end',
-                        title: `START! +${formatRp(200)}`,
+                        title: `🎉 Lewat START! +${formatRp(200)}`,
                         icon: 'success',
                         showConfirmButton: false,
-                        timer: 2000
+                        timer: 2500
                     });
                 }
                 updatePawnPositions();
                 if (step === finalDice) {
                     clearInterval(stepInterval);
                     hasRolled = true;
+                    startActionTimer();
                     setTimeout(() => handleTileLogic(p, BOARD[p.pos]), 400);
                 }
             }, 300);
@@ -69,6 +86,12 @@ function handleTileLogic(p, tile) {
         playSfx(sfx.jail);
         updatePawnPositions();
         updateUI();
+        Swal.fire({
+            title: '🚔 Masuk Penjara!',
+            text: 'Kamu langsung ditangkap dan masuk penjara!',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
     } else if (tile.tipe === 'pajak') {
         p.money -= tile.harga;
         playSfx(sfx.bell);
@@ -97,6 +120,7 @@ function handleTileLogic(p, tile) {
 }
 
 function declareBankrupt() {
+    clearActionTimer();
     let p = players[currentTurn];
     p.isBankrupt = true;
     p.properties.forEach(prop => {
@@ -127,22 +151,37 @@ function promptEndTurn() {
 }
 
 function endTurn() {
+    clearActionTimer();
     document.getElementById(`ui-p${currentTurn}`).classList.remove('active-turn');
     do { currentTurn = (currentTurn + 1) % 4; } while (players[currentTurn].isBankrupt);
 
     document.getElementById(`ui-p${currentTurn}`).classList.add('active-turn');
     document.getElementById('turn-indicator').innerText = `GILIRAN PLAYER ${currentTurn + 1}`;
-    document.getElementById('turn-indicator').className = `fw-bold mb-1 ${pColors[currentTurn]}`;
+    document.getElementById('turn-indicator').className = `turn-indicator-text fw-bold mb-1 ${pColors[currentTurn]}`;
 
     hasRolled = false;
     updateUI();
 
+    const playerIcons = ['fa-chess-pawn', 'fa-chess-knight', 'fa-chess-rook', 'fa-chess-queen'];
+    const playerColorNames = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b'];
+
+    let countdown = 3;
     Swal.fire({
-        title: `<span class="${pColors[currentTurn]}">Giliran Player ${currentTurn + 1}</span>`,
+        title: `<i class="fa-solid ${playerIcons[currentTurn]}" style="color:${playerColorNames[currentTurn]}; font-size:2rem;"></i><br><span style="color:${playerColorNames[currentTurn]}; font-size:1.3rem;">Giliran Player ${currentTurn + 1}!</span>`,
+        html: `<div style="padding:10px 0; color:#555;">Bersiap dalam <b id="swal-countdown">${countdown}</b> detik...</div>`,
         background: pBgSoft[currentTurn],
         allowOutsideClick: false,
-        confirmButtonText: 'OK',
-        didOpen: () => { Swal.disableButtons(); setTimeout(() => { Swal.enableButtons(); }, 2000); }
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: () => {
+            const countdownEl = document.getElementById('swal-countdown');
+            const interval = setInterval(() => {
+                countdown--;
+                if (countdownEl) countdownEl.textContent = countdown;
+                if (countdown <= 0) clearInterval(interval);
+            }, 1000);
+        }
     }).then(() => {
         startAutoRoll();
     });
