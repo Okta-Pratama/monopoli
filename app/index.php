@@ -62,7 +62,24 @@ session_start();
 
     <!-- ===== MONOPOLY BOARD ===== -->
     <div class="monopoly-board" id="board">
-        <?php foreach ($board as $index => $petak): 
+        <?php 
+        // Emoji map for each tile
+        $tileEmojis = [
+            0 => '🚀', // START
+            1 => '🏘️', 2 => '💎', 3 => '🏡', 4 => '🚔',
+            5 => '🚂', 6 => '🌿', 7 => '❓', 8 => '🎓', 9 => '🏭',
+            10 => '⛓️', // Penjara
+            11 => '🦐', 12 => '📚', 13 => '🏔️', 14 => '🎭',
+            15 => '✈️', 16 => '⛩️', 17 => '💎', 18 => '🏛️', 19 => '🌋',
+            20 => '🅿️', // Bebas Parkir
+            21 => '🦈', 22 => '❓', 23 => '🏖️', 24 => '🌺',
+            25 => '✈️', 26 => '⛵', 27 => '🐠', 28 => '💻', 29 => '⛏️',
+            30 => '🚨', // Masuk Penjara
+            31 => '🛢️', 32 => '🌊', 33 => '💎', 34 => '💠',
+            35 => '✈️', 36 => '❓', 37 => '🌉', 38 => '🏦', 39 => '🕌',
+        ];
+        
+        foreach ($board as $index => $petak): 
             $iconClass = 'fa-star';
             if ($petak['tipe'] === 'properti') $iconClass = 'fa-building';
             else if ($petak['tipe'] === 'dana_umum') $iconClass = 'fa-gift';
@@ -70,13 +87,37 @@ session_start();
             else if ($petak['tipe'] === 'pajak') $iconClass = 'fa-money-bill-wave';
             else if ($petak['tipe'] === 'bandara') $iconClass = 'fa-plane';
             else if ($petak['tipe'] === 'utilitas') $iconClass = 'fa-lightbulb';
+            
+            // Determine which side of the board the tile is on
+            if ($index >= 1 && $index <= 9) $side = 'bottom';
+            else if ($index >= 11 && $index <= 19) $side = 'left';
+            else if ($index >= 21 && $index <= 29) $side = 'top';
+            else if ($index >= 31 && $index <= 39) $side = 'right';
+            else $side = 'corner';
+            
+            // Determine color bar color for non-property tiles
+            $barColor = '';
+            if (isset($petak['grup'])) {
+                $barColor = $petak['grup'];
+            } else {
+                switch($petak['tipe']) {
+                    case 'dana_umum': $barColor = '#3b82f6'; break;
+                    case 'kesempatan': $barColor = '#f59e0b'; break;
+                    case 'pajak': $barColor = '#ef4444'; break;
+                    case 'bandara': $barColor = '#64748b'; break;
+                    case 'utilitas': $barColor = '#8b5cf6'; break;
+                }
+            }
+            
+            $emoji = $tileEmojis[$index] ?? '🏠';
         ?>
-            <div class="tile tile-<?= $index ?> <?= $petak['tipe'] ?>" id="tile-<?= $index ?>" onclick="handleTileClick(<?= $index ?>)" style="background-image: url('/public/images/tiles/<?= $index ?>.png');">
+            <div class="tile tile-<?= $index ?> <?= $petak['tipe'] ?> side-<?= $side ?>" id="tile-<?= $index ?>" data-side="<?= $side ?>" onclick="handleTileClick(<?= $index ?>)" style="--tile-color: <?= $barColor ?: '#94a3b8' ?>;">
                 <i class="fa-solid <?= $iconClass ?> fallback-icon"></i>
                 <div class="tile-overlay"></div>
+                <div class="tile-emoji"><?= $emoji ?></div>
                 <div class="house-indicator" id="houses-<?= $index ?>"></div>
-                <?php if(isset($petak['grup'])): ?>
-                    <div class="tile-color-bar" style="background-color: <?= $petak['grup'] ?>"></div>
+                <?php if($barColor): ?>
+                    <div class="tile-color-bar" style="background-color: <?= $barColor ?>"></div>
                 <?php endif; ?>
                 <div class="tile-name">
                     <?= $petak['nama'] ?>
@@ -89,33 +130,58 @@ session_start();
 
         <!-- ===== CENTER BOARD ===== -->
         <div class="center-board">
+            <!-- Decorative Background -->
+            <div class="cb-bg-pattern"></div>
+            <div class="cb-corner-ornament cb-tl"></div>
+            <div class="cb-corner-ornament cb-tr"></div>
+            <div class="cb-corner-ornament cb-bl"></div>
+            <div class="cb-corner-ornament cb-br"></div>
 
-            <!-- Card Decks -->
-            <div class="card-decks">
-                <div class="deck deck-chance" onclick="Swal.fire('Info', 'Kartu Kesempatan akan terbuka otomatis jika Anda mendarat di petaknya.', 'info')">
-                    <i class="fa-solid fa-question"></i><span>KESEMPATAN</span>
-                </div>
-                <div class="deck deck-stats" onclick="Swal.fire('Info', 'Klik tanah kosong di papan untuk membelinya (Akan menarik kartu Statistika).', 'info')">
-                    <i class="fa-solid fa-brain"></i><span>STATISTIKA</span>
-                </div>
-                <div class="deck deck-chest" onclick="Swal.fire('Info', 'Kartu Dana Umum akan terbuka otomatis jika Anda mendarat di petaknya.', 'info')">
-                    <i class="fa-solid fa-gift"></i><span>DANA UMUM</span>
+            <!-- Game Title -->
+            <div class="cb-title-section">
+                <div class="cb-title-frame">
+                    <div class="cb-title-badge">📊</div>
+                    <h1 class="cb-title">MONIKA</h1>
+                    <p class="cb-subtitle">Monopoli Statistika</p>
                 </div>
             </div>
 
-            <!-- Action Panel -->
-            <div class="action-panel">
+            <!-- Card Decks -->
+            <div class="cb-card-decks">
+                <div class="cb-deck cb-deck-chance" onclick="Swal.fire('Info', 'Kartu Kesempatan akan terbuka otomatis jika Anda mendarat di petaknya.', 'info')">
+                    <div class="cb-deck-glow"></div>
+                    <div class="cb-deck-icon"><i class="fa-solid fa-question"></i></div>
+                    <span class="cb-deck-label">KESEMPATAN</span>
+                </div>
+                <div class="cb-deck cb-deck-stats" onclick="Swal.fire('Info', 'Klik tanah kosong di papan untuk membelinya (Akan menarik kartu Statistika).', 'info')">
+                    <div class="cb-deck-glow"></div>
+                    <div class="cb-deck-icon"><i class="fa-solid fa-brain"></i></div>
+                    <span class="cb-deck-label">STATISTIKA</span>
+                </div>
+                <div class="cb-deck cb-deck-chest" onclick="Swal.fire('Info', 'Kartu Dana Umum akan terbuka otomatis jika Anda mendarat di petaknya.', 'info')">
+                    <div class="cb-deck-glow"></div>
+                    <div class="cb-deck-icon"><i class="fa-solid fa-gift"></i></div>
+                    <span class="cb-deck-label">DANA UMUM</span>
+                </div>
+            </div>
+
+            <!-- Control Center -->
+            <div class="cb-control-center">
                 <!-- Stock Rumah -->
-                <div class="stock-minimal" style="color: #10b981;">
-                    <span class="stock-label">Rumah</span>
-                    <i class="fa-solid fa-house"></i>
-                    <span class="fs-4 fw-bold" id="stock-rumah">32</span>
+                <div class="cb-stock cb-stock-house">
+                    <div class="cb-stock-ring">
+                        <i class="fa-solid fa-house"></i>
+                    </div>
+                    <span class="cb-stock-num" id="stock-rumah">32</span>
+                    <span class="cb-stock-label">Rumah</span>
                 </div>
 
-                <!-- Dice & Controls -->
-                <div class="dice-area">
-                    <div id="turn-indicator" class="turn-indicator-text fw-bold text-player-0 mb-1">GILIRAN PLAYER 1</div>
-                    <i id="dice-css-icon" class="fa-solid fa-dice-one text-secondary dice-icon-main"></i><br>
+                <!-- Dice & Turn Area -->
+                <div class="cb-dice-area">
+                    <div id="turn-indicator" class="cb-turn-indicator fw-bold text-player-0">GILIRAN PLAYER 1</div>
+                    <div class="cb-dice-display">
+                        <i id="dice-css-icon" class="fa-solid fa-dice-one cb-dice-icon"></i>
+                    </div>
                     <button id="btn-roll" class="btn-action btn-roll" onclick="processTurn()">🎲 KOCOK DADU (60s)</button>
                     <button id="btn-end" class="btn-action btn-end d-none" onclick="promptEndTurn()">✅ AKHIRI GILIRAN</button>
                     <button id="btn-bankrupt" class="btn-action btn-bankrupt d-none" onclick="declareBankrupt()">💸 BANGKRUT</button>
@@ -129,21 +195,22 @@ session_start();
                 </div>
 
                 <!-- Stock Hotel -->
-                <div class="stock-minimal" style="color: #ef4444;">
-                    <span class="stock-label">Hotel</span>
-                    <i class="fa-solid fa-building"></i>
-                    <span class="fs-4 fw-bold" id="stock-hotel">12</span>
+                <div class="cb-stock cb-stock-hotel">
+                    <div class="cb-stock-ring">
+                        <i class="fa-solid fa-building"></i>
+                    </div>
+                    <span class="cb-stock-num" id="stock-hotel">12</span>
+                    <span class="cb-stock-label">Hotel</span>
                 </div>
             </div>
 
             <!-- Bank Mascot -->
-            <div class="bank-mascot" onclick="Swal.fire({title:'🐷 Pak Bankir', html:'<div style=\'font-size:0.95rem; color:#555;\'>Selamat datang di Bank Monika!<br><br>💰 Mulai dengan <b>Rp 3.000.000</b><br>🎲 Lewati START = <b>+Rp 200.000</b><br>⭐ 3 bintang = masuk <b>Penjara</b><br>🎲 Dadu 6 = bebas dari penjara!</div>',icon:\'info\',confirmButtonText:\'Mengerti!\'})">
-                <div class="mascot-body">
-                    <div class="mascot-hat"></div>
-                    <i class="fa-solid fa-piggy-bank mascot-icon"></i>
-                    <div class="mascot-name">Pak Bankir</div>
-                    <div class="mascot-coins">
-                        <span>💰</span><span>💰</span><span>💰</span>
+            <div class="cb-bank" onclick="Swal.fire({title:'🐷 Pak Bankir', html:'<div style=\'font-size:0.95rem; color:#555;\'>Selamat datang di Bank Monika!<br><br>💰 Mulai dengan <b>Rp 3.000.000</b><br>🎲 Lewati START = <b>+Rp 200.000</b><br>⭐ 3 bintang = masuk <b>Penjara</b><br>🎲 Dadu 6 = bebas dari penjara!</div>',icon:'info',confirmButtonText:'Mengerti!'})">
+                <div class="cb-bank-body">
+                    <i class="fa-solid fa-piggy-bank cb-bank-icon"></i>
+                    <div class="cb-bank-info">
+                        <span class="cb-bank-name">Pak Bankir</span>
+                        <span class="cb-bank-tagline">Klik untuk info 💰</span>
                     </div>
                 </div>
             </div>

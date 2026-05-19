@@ -7,7 +7,7 @@
 $requested_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 // Handle static files (CSS, JS, images, etc)
-if (preg_match('/\.(css|js|jpg|jpeg|png|gif|svg|woff|woff2|ttf|eot)$/i', $requested_path)) {
+if (preg_match('/\.(css|js|jpg|jpeg|png|gif|svg|webp|woff|woff2|ttf|eot|mp3|wav|ogg|webm|ico|json)$/i', $requested_path)) {
     $file = __DIR__ . $requested_path;
     if (file_exists($file)) {
         // Set proper content type
@@ -19,10 +19,17 @@ if (preg_match('/\.(css|js|jpg|jpeg|png|gif|svg|woff|woff2|ttf|eot)$/i', $reques
             'png' => 'image/png',
             'gif' => 'image/gif',
             'svg' => 'image/svg+xml',
+            'webp' => 'image/webp',
             'woff' => 'font/woff',
             'woff2' => 'font/woff2',
             'ttf' => 'font/ttf',
             'eot' => 'application/vnd.ms-fontobject',
+            'mp3' => 'audio/mpeg',
+            'wav' => 'audio/wav',
+            'ogg' => 'audio/ogg',
+            'webm' => 'video/webm',
+            'ico' => 'image/x-icon',
+            'json' => 'application/json',
         ];
         
         $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));

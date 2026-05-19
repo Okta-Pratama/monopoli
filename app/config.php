@@ -33,13 +33,13 @@ $questions = [
 
 // ========== WARNA & STYLING ==========
 $c_coklat = '#964B00'; 
-$c_biru_muda = '#0ea5e9'; 
+$c_biru_muda = '#14b8a6'; /* teal — distinct from Dana Umum blue */
 $c_pink = '#d946ef'; 
-$c_orange = '#f97316'; 
-$c_merah = '#ef4444'; 
-$c_kuning = '#eab308'; 
+$c_orange = '#f43f5e'; /* rose — distinct from Kesempatan amber */
+$c_merah = '#e11d48'; /* deep rose-red */
+$c_kuning = '#84cc16'; /* lime green — distinct from Kesempatan gold */
 $c_hijau = '#10b981'; 
-$c_biru_tua = '#2563eb';
+$c_biru_tua = '#7c3aed'; /* violet — distinct from Dana Umum blue */
 
 // ========== WARNA PEMAIN ==========
 $playerColors = [
