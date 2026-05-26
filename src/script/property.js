@@ -87,6 +87,7 @@ function buildHouse(playerId, tileIndex) {
         stockRumah--;
         p.money -= 50;
         playSfx(sfx.build);
+        logGameEvent(`Player ${p.id + 1} membangun 1 Rumah di <b>${tile.nama}</b>.`, 'build', p.id);
         updateUI();
         Swal.fire('Sukses', '1 Rumah dibangun.', 'success');
     } else if (tile.houses === 4 && stockHotel > 0) {
@@ -95,6 +96,7 @@ function buildHouse(playerId, tileIndex) {
         stockHotel--;
         p.money -= 50;
         playSfx(sfx.build);
+        logGameEvent(`Player ${p.id + 1} mendirikan Hotel mewah di <b>${tile.nama}</b>!`, 'build', p.id);
         updateUI();
         Swal.fire('Megah!', 'Hotel dibangun.', 'success');
     } else {
@@ -106,6 +108,7 @@ function mortgage(pId, tIdx, gain) {
     BOARD[tIdx].mortgaged = true;
     players[pId].money += gain;
     playSfx(sfx.buy);
+    logGameEvent(`Player ${pId + 1} menggadaikan <b>${BOARD[tIdx].nama}</b> seharga ${formatRp(gain)}.`, 'buy', pId);
     updateUI();
     Swal.close();
 }
@@ -115,6 +118,7 @@ function unmortgage(pId, tIdx, cost) {
     BOARD[tIdx].mortgaged = false;
     players[pId].money -= cost;
     playSfx(sfx.buy);
+    logGameEvent(`Player ${pId + 1} menebus gadai <b>${BOARD[tIdx].nama}</b> seharga ${formatRp(cost)}.`, 'buy', pId);
     updateUI();
     Swal.close();
 }
@@ -124,6 +128,7 @@ function sellHouse(pId, tIdx) {
     stockRumah++;
     players[pId].money += 25;
     playSfx(sfx.buy);
+    logGameEvent(`Player ${pId + 1} menjual 1 Rumah di <b>${BOARD[tIdx].nama}</b> seharga ${formatRp(25)}.`, 'buy', pId);
     updateUI();
     Swal.close();
 }
@@ -134,6 +139,7 @@ function sellHotel(pId, tIdx) {
     stockRumah -= 4;
     players[pId].money += 25;
     playSfx(sfx.buy);
+    logGameEvent(`Player ${pId + 1} menurunkan Hotel di <b>${BOARD[tIdx].nama}</b> menjadi 4 Rumah seharga ${formatRp(25)}.`, 'buy', pId);
     updateUI();
     Swal.close();
 }
@@ -173,9 +179,13 @@ function offerProperty(buyerId, sellerId, tileIndex) {
                     seller.properties = seller.properties.filter(x => x.nama !== tile.nama);
                     buyer.properties.push(tile);
                     playSfx(sfx.buy);
+                    logGameEvent(`Player ${buyerId + 1} membeli <b>${tile.nama}</b> dari Player ${sellerId + 1} seharga ${formatRp(amount)}.`, 'buy', buyerId);
                     updateUI();
                     Swal.fire('Deal!', 'Properti berpindah tangan.', 'success');
-                } else Swal.fire('Ditolak', 'Tawaran ditolak.', 'error');
+                } else {
+                    logGameEvent(`Tawaran Player ${buyerId + 1} untuk membeli <b>${tile.nama}</b> ditolak oleh Player ${sellerId + 1}.`, 'system', sellerId);
+                    Swal.fire('Ditolak', 'Tawaran ditolak.', 'error');
+                }
             });
         }
     });

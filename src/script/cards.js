@@ -31,6 +31,7 @@ function triggerStatsQuestion(p, tileIndex) {
             // Jawaban benar — reset stars
             p.stars = 0;
             updateStarIndicator(p.id);
+            logGameEvent(`Player ${p.id + 1} menjawab kuis Statistika dengan <b>BENAR</b>! (Reward: ${formatRp(q.poin)})`, 'statistika', p.id);
             Swal.fire({
                 title: 'Tepat!',
                 text: `Reward ${formatRp(q.poin)} akan masuk saldo. Beli ${tile.nama} seharga ${formatRp(tile.harga)}?`,
@@ -45,6 +46,7 @@ function triggerStatsQuestion(p, tileIndex) {
                         tile.owner = p.id;
                         p.properties.push(tile);
                         playSfx(sfx.buy);
+                        logGameEvent(`Player ${p.id + 1} membeli <b>${tile.nama}</b> seharga ${formatRp(tile.harga)}.`, 'buy', p.id);
                         Swal.fire('Sukses!', `${tile.nama} berhasil dibeli!`, 'success').then(() => updateUI());
                     } else {
                         Swal.fire('Uang Kurang', `Reward diterima tapi uang kurang untuk beli tanah. Sekarang punya ${formatRp(p.money)}.`, 'info').then(() => updateUI());
@@ -58,6 +60,7 @@ function triggerStatsQuestion(p, tileIndex) {
             // Jawaban salah — tambah bintang
             p.stars++;
             updateStarIndicator(p.id);
+            logGameEvent(`Player ${p.id + 1} menjawab kuis Statistika dengan <b>SALAH</b>! (Jawaban Anda: "${res.value || ''}", Kunci: "${q.jawaban_kunci}", Peringatan: ${p.stars}/3)`, 'statistika', p.id);
 
             if (p.stars >= 3) {
                 Swal.fire({
@@ -74,6 +77,7 @@ function triggerStatsQuestion(p, tileIndex) {
                     playSfx(sfx.jail);
                     updatePawnPositions();
                     updateUI();
+                    logGameEvent(`Player ${p.id + 1} dijebloskan ke Penjara karena 3x salah menjawab soal!`, 'jail', p.id);
                 });
             } else {
                 const starDisplay = '⭐'.repeat(p.stars) + '☆'.repeat(3 - p.stars);
@@ -94,6 +98,7 @@ function triggerStatsQuestion(p, tileIndex) {
                             tile.owner = p.id;
                             p.properties.push(tile);
                             playSfx(sfx.buy);
+                            logGameEvent(`Player ${p.id + 1} membeli <b>${tile.nama}</b> seharga ${formatRp(tile.harga)}.`, 'buy', p.id);
                             Swal.fire('Sukses!', `${tile.nama} berhasil dibeli!`, 'success').then(() => updateUI());
                         } else {
                             Swal.fire('Uang Kurang', `Uang tidak cukup untuk beli tanah. Sekarang punya ${formatRp(p.money)}.`, 'error').then(() => updateUI());
@@ -150,6 +155,7 @@ function drawCard(type, p) {
         } else if (cardDetails.reward.type === 'money' || cardDetails.reward.type === 'penalty') {
             p.money += cardDetails.reward.amount;
         }
+        logGameEvent(`Player ${p.id + 1} menarik Kartu <b>${cardDetails.title}</b>: "${cardDetails.text}"`, 'card', p.id);
         updateUI();
         if (p.money < 0) {
             hasRolled = true;

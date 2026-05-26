@@ -3,6 +3,164 @@
  * UI & Display Management
  */
 
+// ========== GLOBAL GAME TIMER, SOUND & LOGS ==========
+let gameStartTime = Date.now();
+let gameTimerInterval;
+let isMuted = false;
+let unreadLogsCount = 0;
+
+function initGameTimer() {
+    gameStartTime = Date.now();
+    clearInterval(gameTimerInterval);
+    gameTimerInterval = setInterval(() => {
+        const diff = Date.now() - gameStartTime;
+        const hrs = Math.floor(diff / 3600000).toString().padStart(2, '0');
+        const mins = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+        const secs = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+        const timerEl = document.getElementById('game-duration');
+        if (timerEl) {
+            timerEl.textContent = `${hrs}:${mins}:${secs}`;
+        }
+    }, 1000);
+}
+
+// Sound Control Interceptor
+const originalPlaySfx = playSfx;
+playSfx = function(sound) {
+    if (isMuted) return;
+    originalPlaySfx(sound);
+};
+
+function toggleMute() {
+    isMuted = !isMuted;
+    const btn = document.getElementById('btn-sound-toggle');
+    if (btn) {
+        if (isMuted) {
+            btn.innerHTML = `<i class="fa-solid fa-volume-xmark"></i>`;
+            btn.title = "Unmute Suara";
+            btn.style.color = '#ef4444';
+        } else {
+            btn.innerHTML = `<i class="fa-solid fa-volume-high"></i>`;
+            btn.title = "Mute Suara";
+            btn.style.color = '';
+        }
+    }
+}
+
+// Help Modal Controls
+function showHelpModal() {
+    const modal = document.getElementById('help-modal');
+    if (modal) {
+        modal.classList.remove('d-none');
+        modal.classList.add('animate__animated', 'animate__fadeIn');
+    }
+}
+function hideHelpModal() {
+    const modal = document.getElementById('help-modal');
+    if (modal) {
+        modal.classList.add('d-none');
+    }
+}
+function closeHelpModalOnOuterClick(e) {
+    if (e.target.id === 'help-modal') {
+        hideHelpModal();
+    }
+}
+
+// Activity Log System
+function logGameEvent(message, type = 'system', playerId = null) {
+    const logList = document.getElementById('game-log-list');
+    if (!logList) return;
+    
+    // Hapus placeholder jika ada
+    const placeholder = logList.querySelector('.log-placeholder');
+    if (placeholder) placeholder.remove();
+    
+    const timeStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    
+    const logItem = document.createElement('div');
+    logItem.className = `log-item ${playerId !== null ? 'p-' + playerId : type}`;
+    
+    let icon = '⚙️';
+    if (type === 'dice') icon = '🎲';
+    else if (type === 'buy') icon = '💰';
+    else if (type === 'build') icon = '🔨';
+    else if (type === 'rent') icon = '💸';
+    else if (type === 'jail') icon = '🚔';
+    else if (type === 'card') icon = '🎫';
+    else if (type === 'statistika') icon = '📊';
+    
+    logItem.innerHTML = `
+        <span class="log-item-time">${timeStr}</span>
+        <strong>${icon}</strong> ${message}
+    `;
+    
+    logList.appendChild(logItem);
+    logList.scrollTop = logList.scrollHeight;
+    
+    // Perbarui badge unread jika panel minimized
+    const panel = document.getElementById('game-log-panel');
+    if (panel && panel.classList.contains('minimized')) {
+        unreadLogsCount++;
+        const badge = document.getElementById('log-unread-badge');
+        if (badge) {
+            badge.textContent = unreadLogsCount;
+            badge.classList.remove('d-none');
+            badge.classList.add('animate__animated', 'animate__bounceIn');
+        }
+    }
+}
+
+function toggleLogPanel() {
+    const panel = document.getElementById('game-log-panel');
+    const floatToggle = document.getElementById('floating-log-toggle');
+    if (!panel) return;
+    
+    if (panel.classList.contains('minimized')) {
+        panel.classList.remove('minimized');
+        if (floatToggle) floatToggle.classList.add('d-none');
+        unreadLogsCount = 0;
+        const badge = document.getElementById('log-unread-badge');
+        if (badge) badge.classList.add('d-none');
+    } else {
+        panel.classList.add('minimized');
+        if (floatToggle) floatToggle.classList.remove('d-none');
+    }
+}
+
+function clearGameLogs() {
+    const logList = document.getElementById('game-log-list');
+    if (logList) {
+        logList.innerHTML = `<div class="log-placeholder">Log dibersihkan. Giliran berjalan akan terus mencatat!</div>`;
+    }
+}
+
+// Group names map helper
+function getGroupNameByColor(color) {
+    const colorsMap = {
+        '#964b00': 'Kelompok Coklat',
+        '#14b8a6': 'Kelompok Teal',
+        '#d946ef': 'Kelompok Pink',
+        '#f43f5e': 'Kelompok Rose',
+        '#e11d48': 'Kelompok Merah',
+        '#84cc16': 'Kelompok Lime',
+        '#10b981': 'Kelompok Hijau',
+        '#7c3aed': 'Kelompok Violet'
+    };
+    return colorsMap[color.toLowerCase()] || colorsMap[color] || 'Properti';
+}
+
+function hexToRgb(hex) {
+    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+        return r + r + g + g + b + b;
+    });
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? 
+        parseInt(result[1], 16) + ',' + parseInt(result[2], 16) + ',' + parseInt(result[3], 16)
+        : '255,255,255';
+}
+
 // ========== AUTO ROLL TIMER — detik ==========
 function startAutoRoll() {
     rollCountdown = 3;
@@ -110,9 +268,8 @@ function updateStarIndicator(playerId) {
     const stars = p.stars || 0;
     el.innerHTML = '';
     for (let i = 0; i < 3; i++) {
-        const star = document.createElement('span');
-        star.className = i < stars ? 'star-filled' : 'star-empty';
-        star.textContent = i < stars ? '⭐' : '☆';
+        const star = document.createElement('i');
+        star.className = i < stars ? 'fa-solid fa-star star-filled' : 'fa-solid fa-star star-empty';
         el.appendChild(star);
     }
 }
@@ -124,8 +281,68 @@ function updateUI() {
 
     let p = players[currentTurn];
 
+    // Update turn status in header
+    const headerTurn = document.getElementById('header-turn-status');
+    if (headerTurn) {
+        headerTurn.textContent = `Giliran: Player ${currentTurn + 1}`;
+        headerTurn.style.color = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b'][currentTurn];
+    }
+
     players.forEach(player => {
-        if (player.isBankrupt) return;
+        // If bankrupt, render bankrupt overlay and skip further rendering
+        const sectionEl = document.getElementById(`ui-p${player.id}`);
+        if (player.isBankrupt) {
+            if (sectionEl) {
+                sectionEl.classList.add('bankrupt-ui');
+                let overlay = sectionEl.querySelector('.bankrupt-overlay-banner');
+                if (!overlay) {
+                    overlay = document.createElement('div');
+                    overlay.className = 'bankrupt-overlay-banner';
+                    overlay.innerHTML = `<div class="bankrupt-badge-banner">BANKRUT</div>`;
+                    sectionEl.appendChild(overlay);
+                }
+            }
+            return;
+        } else {
+            if (sectionEl) {
+                sectionEl.classList.remove('bankrupt-ui');
+                let overlay = sectionEl.querySelector('.bankrupt-overlay-banner');
+                if (overlay) overlay.remove();
+            }
+        }
+
+        // Calculate Player Net Worth
+        let netWorth = player.money;
+        player.properties.forEach(prop => {
+            let tileIndex = BOARD.findIndex(t => t.nama === prop.nama);
+            let tile = BOARD[tileIndex];
+            let propVal = tile.harga;
+            if (tile.mortgaged) {
+                propVal = tile.harga / 2;
+            } else {
+                if (tile.houses && tile.houses > 0) {
+                    if (tile.houses === 5) {
+                        propVal += 250; // hotel investment value
+                    } else {
+                        propVal += tile.houses * 50; // houses investment value
+                    }
+                }
+            }
+            netWorth += propVal;
+        });
+
+        // Update net worth badge dynamically
+        let nwEl = document.getElementById(`networth-p${player.id}`);
+        if (!nwEl) {
+            nwEl = document.createElement('div');
+            nwEl.id = `networth-p${player.id}`;
+            nwEl.className = 'player-networth-badge';
+            const starInd = document.getElementById(`stars-p${player.id}`);
+            if (starInd) {
+                starInd.parentNode.insertBefore(nwEl, starInd);
+            }
+        }
+        nwEl.innerHTML = `<i class="fa-solid fa-chart-line"></i> Aset: <span class="player-networth-val">${formatRp(netWorth)}</span>`;
 
         // Update money
         let mEl = document.getElementById(`money-p${player.id}`);
@@ -138,69 +355,119 @@ function updateUI() {
         // Update star indicator
         updateStarIndicator(player.id);
 
-        // Active player highlight badge
+        // Active player highlight badge and section class
         const activeBadge = document.getElementById(`active-badge-${player.id}`);
+        if (sectionEl) {
+            sectionEl.classList.toggle('active-turn', player.id === currentTurn);
+        }
         if (activeBadge) {
             activeBadge.classList.toggle('d-none', player.id !== currentTurn);
         }
 
-        // ===== REDESIGNED INVENTORY / CERTIFICATE =====
+        // ===== REDESIGNED INVENTORY / CERTIFICATE WITH GROUPING =====
         const invDiv = document.getElementById(`inv-p${player.id}`);
         invDiv.innerHTML = '';
 
-        player.properties.forEach((prop) => {
+        // Group properties
+        let groups = {};
+        player.properties.forEach(prop => {
             let tileIndex = BOARD.findIndex(t => t.nama === prop.nama);
             let tile = BOARD[tileIndex];
+            let grpName = tile.grup || tile.tipe;
+            if (!groups[grpName]) {
+                groups[grpName] = [];
+            }
+            groups[grpName].push({ tileIndex, tile, prop });
+        });
 
-            // Determine status description
-            let statusText = '';
-            let statusIcon = '';
-            let statusClass = 'cert-status-empty';
-
-            if (tile.mortgaged) {
-                statusText = 'Digadaikan';
-                statusIcon = '🔒';
-                statusClass = 'cert-status-mortgaged';
-            } else if (!tile.houses || tile.houses === 0) {
-                statusText = 'Tanah Kosong';
-                statusIcon = '🌿';
-                statusClass = 'cert-status-empty';
-            } else if (tile.houses < 5) {
-                statusText = `${tile.houses} Rumah`;
-                statusIcon = '🏠'.repeat(tile.houses);
-                statusClass = 'cert-status-house';
+        // Render grouped properties
+        Object.keys(groups).forEach(grpKey => {
+            const grpProps = groups[grpKey];
+            let groupTitle = grpKey;
+            let headerColor = grpKey;
+            
+            if (grpKey === 'bandara') {
+                groupTitle = 'Stasiun & Bandara';
+                headerColor = '#64748b';
+            } else if (grpKey === 'utilitas') {
+                groupTitle = 'Utilitas Publik';
+                headerColor = '#8b5cf6';
             } else {
-                statusText = 'Hotel';
-                statusIcon = '🏨';
-                statusClass = 'cert-status-hotel';
+                if (grpKey.startsWith('#')) {
+                    groupTitle = getGroupNameByColor(grpKey);
+                }
             }
 
-            invDiv.innerHTML += `
-                <div class="cert-card" style="border-left-color: ${prop.grup || '#aaa'}">
-                    <div class="cert-top-row">
-                        <div class="cert-name" style="color: ${prop.grup || '#333'}">${prop.nama}</div>
-                        <button class="cert-inspect-btn" onclick="handleTileClick(${tileIndex})" title="Inspeksi Properti">
-                            <i class="fa-solid fa-eye"></i>
-                        </button>
-                    </div>
-                    <div class="cert-status ${statusClass}">
-                        <span class="cert-status-icon">${statusIcon}</span>
-                        <span class="cert-status-text">${statusText}</span>
-                    </div>
-                </div>`;
+            let groupHtml = `<div class="inventory-group">
+                <div class="inventory-group-title" style="color: ${headerColor}; border-bottom-color: rgba(${hexToRgb(headerColor)}, 0.15)">${groupTitle}</div>`;
+            
+            grpProps.forEach(({ tileIndex, tile, prop }) => {
+                let statusText = '';
+                let statusIcon = '';
+                let statusClass = 'cert-status-empty';
+
+                if (tile.mortgaged) {
+                    statusText = 'Digadaikan';
+                    statusIcon = '<i class="fa-solid fa-lock text-secondary"></i>';
+                    statusClass = 'cert-status-mortgaged';
+                } else if (!tile.houses || tile.houses === 0) {
+                    statusText = 'Tanah';
+                    statusIcon = '<i class="fa-solid fa-seedling"></i>';
+                    statusClass = 'cert-status-empty';
+                } else if (tile.houses < 5) {
+                    statusText = `${tile.houses} Rumah`;
+                    statusIcon = '<i class="fa-solid fa-house"></i>'.repeat(tile.houses);
+                    statusClass = 'cert-status-house';
+                } else {
+                    statusText = 'Hotel';
+                    statusIcon = '<i class="fa-solid fa-building"></i>';
+                    statusClass = 'cert-status-hotel';
+                }
+
+                groupHtml += `
+                    <div class="cert-card">
+                        <div class="cert-card-header" style="background-color: ${headerColor}"></div>
+                        <div class="cert-card-content">
+                            <div class="cert-top-row">
+                                <div class="cert-name">${prop.nama}</div>
+                                <button class="cert-inspect-btn" onclick="handleTileClick(${tileIndex})" title="Inspeksi Properti">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="cert-status ${statusClass}">
+                                <span class="cert-status-text">${statusText}</span>
+                                <span class="cert-status-icon">${statusIcon}</span>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+
+            groupHtml += `</div>`;
+            invDiv.innerHTML += groupHtml;
         });
 
-        player.cards.forEach((c) => {
-            invDiv.innerHTML += `
-                <div class="cert-card cert-card-special">
-                    <div class="cert-top-row">
-                        <div class="cert-name" style="color: #f39c12;">🎫 ${c.nama}</div>
-                    </div>
-                    <div class="cert-status cert-status-card">
-                        <span class="cert-status-text">Kartu Khusus</span>
-                    </div>
-                </div>`;
-        });
+        // Special Cards (Jail Cards, etc.)
+        if (player.cards.length > 0) {
+            let cardsHtml = `<div class="inventory-group">
+                <div class="inventory-group-title" style="color: #fbbf24; border-bottom-color: rgba(251, 191, 36, 0.15)">Kartu Khusus</div>`;
+            player.cards.forEach((c) => {
+                cardsHtml += `
+                    <div class="cert-card">
+                        <div class="cert-card-header" style="background-color: #fbbf24"></div>
+                        <div class="cert-card-content">
+                            <div class="cert-top-row">
+                                <div class="cert-name" style="color: #fbbf24;">🎫 ${c.nama}</div>
+                            </div>
+                            <div class="cert-status cert-status-card">
+                                <span class="cert-status-text">Kartu Bebas Penjara</span>
+                                <span class="cert-status-icon"><i class="fa-solid fa-ticket"></i></span>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+            cardsHtml += `</div>`;
+            invDiv.innerHTML += cardsHtml;
+        }
     });
 
     // Board Indicators
@@ -271,7 +538,7 @@ function calculateAssets(id) {
     return val;
 }
 
-function updatePawnPositions() {
+function updatePawnPositions(isIntro = false) {
     players.forEach(p => {
         if (p.isBankrupt) return;
         const tileEl = document.getElementById(`tile-${p.pos}`);
@@ -283,7 +550,67 @@ function updatePawnPositions() {
             const left = rect.left - boardRect.left + (rect.width / 2) - 15;
             const offsetX = p.id % 2 === 0 ? -12 : 12;
             const offsetY = p.id < 2 ? -12 : 12;
-            pawnEl.style.transform = `translate(${left + offsetX}px, ${top + offsetY}px)`;
+            const targetX = left + offsetX;
+            const targetY = top + offsetY;
+
+            if (isIntro) {
+                // Posisi awal di atas langit-langit papan
+                pawnEl.style.transform = `translate(${targetX}px, -150px) scale(2.5)`;
+                pawnEl.style.opacity = '0';
+                pawnEl.style.transition = 'none';
+
+                // Memicu reflow
+                pawnEl.offsetHeight;
+
+                // Animasi drop secara staggered
+                setTimeout(() => {
+                    pawnEl.style.transition = 'transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.8s ease';
+                    pawnEl.style.transform = `translate(${targetX}px, ${targetY}px) scale(1)`;
+                    pawnEl.style.opacity = '1';
+                }, 200 + p.id * 150);
+            } else {
+                pawnEl.style.transition = 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
+                pawnEl.style.transform = `translate(${targetX}px, ${targetY}px)`;
+                pawnEl.style.opacity = '1';
+            }
         }
     });
+}
+
+function startGameWithIntro() {
+    // Play intro sound (door opening)
+    if (typeof playSfx === 'function' && typeof sfx !== 'undefined' && sfx.door) {
+        playSfx(sfx.door);
+    }
+
+    // Animate out intro screen
+    const introScreen = document.getElementById('intro-screen');
+    if (introScreen) {
+        introScreen.classList.add('animate__animated', 'animate__zoomOut');
+        setTimeout(() => {
+            introScreen.style.display = 'none';
+        }, 600);
+    }
+
+    // Animate in app container
+    const appContainer = document.querySelector('.app-container');
+    if (appContainer) {
+        appContainer.classList.add('game-started');
+    }
+
+    // Staggered pawn drop animation
+    setTimeout(() => {
+        updatePawnPositions(true);
+    }, 400);
+
+    // Initialize timer and auto roll after animations complete
+    setTimeout(() => {
+        initGameTimer();
+        if (typeof logGameEvent === 'function') {
+            logGameEvent("Permainan dimulai! Selamat datang di MONIKA (Monopoly Statistika).", "system");
+        }
+        if (typeof startAutoRoll === 'function') {
+            startAutoRoll();
+        }
+    }, 1500);
 }

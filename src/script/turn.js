@@ -48,6 +48,7 @@ function rollAndMove(p) {
             clearInterval(rollInterval);
             let finalDice = Math.floor(Math.random() * 6) + 1;
             diceIcon.className = `fa-solid ${dCls[finalDice - 1]} ${pColors[p.id]} animate__animated animate__bounceIn`;
+            logGameEvent(`Player ${p.id + 1} mengocok dadu dan mendapat angka <b>${finalDice}</b>.`, 'dice', p.id);
 
             let step = 0;
             let stepInterval = setInterval(() => {
@@ -57,6 +58,7 @@ function rollAndMove(p) {
                 if (p.pos === 0) {
                     p.money += 200;
                     updateUI();
+                    logGameEvent(`Player ${p.id + 1} melewati START dan mendapat bonus ${formatRp(200)}.`, 'buy', p.id);
                     Swal.fire({
                         toast: true,
                         position: 'top-end',
@@ -86,6 +88,7 @@ function handleTileLogic(p, tile) {
         playSfx(sfx.jail);
         updatePawnPositions();
         updateUI();
+        logGameEvent(`Player ${p.id + 1} dijebloskan ke Penjara!`, 'jail', p.id);
         Swal.fire({
             title: '🚔 Masuk Penjara!',
             text: 'Kamu langsung ditangkap dan masuk penjara!',
@@ -96,6 +99,7 @@ function handleTileLogic(p, tile) {
         p.money -= tile.harga;
         playSfx(sfx.bell);
         updateUI();
+        logGameEvent(`Player ${p.id + 1} membayar Pajak sebesar ${formatRp(tile.harga)}.`, 'rent', p.id);
         Swal.fire('Denda!', `Kamu bayar ${formatRp(tile.harga)}`, 'error');
     } else if (tile.tipe === 'kesempatan' || tile.tipe === 'dana_umum') {
         drawCard(tile.tipe, p);
@@ -110,6 +114,7 @@ function handleTileLogic(p, tile) {
                 players[tile.owner].money += rent;
                 playSfx(sfx.bell);
                 updateUI();
+                logGameEvent(`Player ${p.id + 1} membayar sewa ${formatRp(rent)} ke Player ${tile.owner + 1} di <b>${tile.nama}</b>.`, 'rent', p.id);
                 Swal.fire('Bayar Sewa!', `Membayar ${formatRp(rent)} ke Player ${tile.owner + 1}`, 'warning');
             }
         } else if (tile.owner === undefined && p.money >= tile.harga) {
@@ -135,6 +140,7 @@ function declareBankrupt() {
     p.money = 0;
     document.getElementById('pawn-' + p.id).classList.add('bankrupt-pawn');
     document.getElementById('ui-p' + p.id).classList.add('bankrupt-ui');
+    logGameEvent(`Player ${p.id + 1} dinyatakan bangkrut! Semua aset disita oleh bank.`, 'system', p.id);
     Swal.fire('Bangkrut!', `Player ${p.id + 1} telah bangkrut dan keluar dari permainan.`, 'error').then(() => endTurn());
 }
 

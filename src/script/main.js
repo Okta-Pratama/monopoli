@@ -1,6 +1,6 @@
-// untuk mengeksekusi awal permaini
+// untuk mengeksekusi awal permainan
 window.onload = () => {
     updateUI();
-    updatePawnPositions();
-    startAutoRoll();
+    updatePawnPositions(false);
 };
+

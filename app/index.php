@@ -26,7 +26,60 @@ session_start();
     const QUESTIONS = <?= json_encode($questions) ?>;
 </script>
 
-<div class="game-wrapper">
+<!-- ===== INTRO / SPLASH SCREEN ===== -->
+<div id="intro-screen" class="intro-screen">
+    <div class="intro-card animate__animated animate__zoomIn">
+        <div class="intro-logo">📊</div>
+        <h1 class="intro-title">MONIKA</h1>
+        <p class="intro-subtitle">Monopoli Statistika</p>
+        <div class="intro-divider"></div>
+        <div class="intro-creators">
+            <span class="creators-label">Dibuat Oleh:</span>
+            <span class="creators-name">Kelompok 3 Statistika & Probabilitas</span>
+        </div>
+        <button id="btn-start-game" class="intro-start-btn" onclick="startGameWithIntro()">
+            🚀 MULAI PERMAINAN
+        </button>
+    </div>
+</div>
+
+<div class="app-container">
+    <!-- ===== HEADER BAR ===== -->
+    <header class="app-header">
+        <div class="header-logo">
+            <span class="logo-icon">📊</span>
+            <div class="logo-text">
+                <h1>MONIKA</h1>
+                <p>Monopoli Statistika</p>
+            </div>
+        </div>
+        
+        <div class="header-center-info">
+            <div class="header-stat-item">
+                <i class="fa-solid fa-clock"></i>
+                <span id="game-duration">00:00:00</span>
+            </div>
+            <div class="header-stat-separator"></div>
+            <div class="header-stat-item">
+                <i class="fa-solid fa-gamepad"></i>
+                <span id="header-turn-status">Giliran: Player 1</span>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <button id="btn-sound-toggle" class="header-btn" onclick="toggleMute()" title="Mute/Unmute Suara">
+                <i class="fa-solid fa-volume-high"></i>
+            </button>
+            <button class="header-btn" onclick="showHelpModal()" title="Bantuan & Aturan Main">
+                <i class="fa-solid fa-book-open"></i> Aturan
+            </button>
+            <button class="header-btn toggle-log-btn" onclick="toggleLogPanel()" title="Log Aktivitas">
+                <i class="fa-solid fa-list-ul"></i> Log
+            </button>
+        </div>
+    </header>
+
+    <div class="game-wrapper">
 
     <!-- ===== LEFT PANEL: Player 1 & 2 ===== -->
     <div class="side-panel left-panel">
@@ -253,6 +306,70 @@ session_start();
                 <div class="inventory-flat" id="inv-p<?= $i ?>"></div>
             </div>
             <?php endfor; ?>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- ===== FLOATING GAME LOG PANEL ===== -->
+<div id="game-log-panel" class="game-log-panel minimized">
+    <div class="log-header">
+        <span><i class="fa-solid fa-list-ul me-2"></i>Log Aktivitas</span>
+        <div class="log-header-actions">
+            <button onclick="clearGameLogs()" title="Bersihkan Log" class="log-action-btn"><i class="fa-solid fa-trash-can"></i></button>
+            <button onclick="toggleLogPanel()" title="Tutup Log" class="log-action-btn"><i class="fa-solid fa-chevron-down"></i></button>
+        </div>
+    </div>
+    <div id="game-log-list" class="log-body">
+        <div class="log-placeholder">Belum ada aktivitas. Kocok dadu untuk memulai!</div>
+    </div>
+</div>
+
+<!-- Toggle Log Floating Button (ketika panel ditutup) -->
+<button id="floating-log-toggle" class="floating-log-toggle" onclick="toggleLogPanel()" title="Buka Log Aktivitas">
+    <i class="fa-solid fa-list-ul"></i>
+    <span class="badge bg-danger d-none" id="log-unread-badge">0</span>
+</button>
+
+<!-- ===== HELP MODAL ===== -->
+<div id="help-modal" class="custom-modal-overlay d-none" onclick="closeHelpModalOnOuterClick(event)">
+    <div class="custom-modal-content">
+        <div class="custom-modal-header">
+            <h3><i class="fa-solid fa-book-open me-2"></i>Panduan & Aturan Main MONIKA</h3>
+            <button class="modal-close-btn" onclick="hideHelpModal()">&times;</button>
+        </div>
+        <div class="custom-modal-body">
+            <div class="rule-section">
+                <h5><i class="fa-solid fa-coins text-warning me-2"></i>Modal Awal & Uang Kas</h5>
+                <p>Setiap pemain memulai dengan modal kas sebesar <strong>Rp 3.000.000</strong>. Jika kas Anda mencapai nilai negatif, Anda wajib melunasi hutang dengan menggadaikan atau menjual rumah/hotel Anda sebelum giliran berakhir.</p>
+            </div>
+            
+            <div class="rule-section">
+                <h5><i class="fa-solid fa-brain text-danger me-2"></i>Pembelian Tanah & Soal Statistika</h5>
+                <p>Untuk membeli tanah kosong yang Anda darati, Anda harus menjawab pertanyaan <strong>Statistika</strong> terlebih dahulu:</p>
+                <ul>
+                    <li><strong>Jawaban Benar:</strong> Anda berhak membeli tanah tersebut dan mendapatkan poin/reward uang tunai tambahan.</li>
+                    <li><strong>Jawaban Salah:</strong> Anda mendapatkan <strong>1 Bintang Peringatan</strong>. Anda tetap boleh membeli tanah tersebut dengan harga normal, namun jika Anda mengumpulkan <strong>3 Bintang</strong>, Anda akan otomatis masuk <strong>Penjara</strong>.</li>
+                </ul>
+            </div>
+            
+            <div class="rule-section">
+                <h5><i class="fa-solid fa-hammer text-primary me-2"></i>Pembangunan Rumah & Hotel</h5>
+                <p>Anda dapat membangun rumah/hotel jika Anda memiliki seluruh properti dalam satu kelompok warna (Monopoli). Pembangunan harus merata sesuai aturan.</p>
+            </div>
+
+            <div class="rule-section">
+                <h5><i class="fa-solid fa-bars-staggered text-warning me-2"></i>Keluar dari Penjara</h5>
+                <p>Jika berada di penjara, Anda dapat bebas dengan cara:</p>
+                <ul>
+                    <li>Membayar denda sebesar <strong>Rp 50.000</strong> di awal giliran.</li>
+                    <li>Mencoba mengocok dadu dan mendapatkan angka <strong>6</strong> (kesempatan 3 putaran).</li>
+                    <li>Menggunakan Kartu Bebas Penjara jika memilikinya.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="custom-modal-footer">
+            <button class="btn btn-primary" onclick="hideHelpModal()">Saya Mengerti, Mulai Main!</button>
         </div>
     </div>
 </div>

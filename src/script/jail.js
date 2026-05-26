@@ -10,6 +10,7 @@ function payJail(id) {
     p.stars = 0;
     p.jailTurns = 0;
     playSfx(sfx.door);
+    logGameEvent(`Player ${p.id + 1} membayar denda bebas penjara sebesar ${formatRp(50)}.`, 'jail', p.id);
     updateUI();
     Swal.close();
     if (p.money < 0) {
@@ -22,11 +23,15 @@ function payJail(id) {
 }
 
 function skipJailTurn(id) {
-    players[id].jailTurns++;
-    if (players[id].jailTurns >= 2) {
-        players[id].inJail = false;
-        players[id].stars = 0;
+    let p = players[id];
+    p.jailTurns++;
+    if (p.jailTurns >= 2) {
+        p.inJail = false;
+        p.stars = 0;
         playSfx(sfx.door);
+        logGameEvent(`Player ${p.id + 1} dibebaskan secara otomatis setelah melewati giliran ke-2 di penjara.`, 'jail', p.id);
+    } else {
+        logGameEvent(`Player ${p.id + 1} melewatkan giliran di penjara (Tahanan: ${p.jailTurns}/2).`, 'jail', p.id);
     }
     hasRolled = true;
     updateUI();
@@ -57,6 +62,7 @@ function rollDiceJail(id) {
                 p.stars = 0;
                 p.jailTurns = 0;
                 playSfx(sfx.door);
+                logGameEvent(`Player ${p.id + 1} mengocok dadu di penjara dan mendapatkan angka 6! Bebas dari penjara!`, 'jail', p.id);
                 updateUI();
                 Swal.fire({
                     title: '🎲 Dadu 6! Bebas!',
@@ -91,6 +97,7 @@ function rollDiceJail(id) {
                 // Gagal bebas
                 p.jailTurns++;
                 hasRolled = true;
+                logGameEvent(`Player ${p.id + 1} mengocok dadu di penjara dan mendapatkan angka ${finalDice} (Gagal bebas!).`, 'jail', p.id);
                 updateUI();
                 Swal.fire({
                     title: `🎲 Dadu ${finalDice} — Gagal!`,
@@ -114,6 +121,7 @@ function useJailCard(id) {
         p.stars = 0;
         p.jailTurns = 0;
         playSfx(sfx.door);
+        logGameEvent(`Player ${p.id + 1} menggunakan Kartu Bebas Penjara untuk keluar secara gratis.`, 'jail', p.id);
         updateUI();
         Swal.fire('Bebas!', 'Kartu digunakan. Silakan kocok dadu!', 'success').then(() => { if (!hasRolled) rollAndMove(p); });
     }
