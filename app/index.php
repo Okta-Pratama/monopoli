@@ -44,41 +44,6 @@ session_start();
 </div>
 
 <div class="app-container">
-    <!-- ===== HEADER BAR ===== -->
-    <header class="app-header">
-        <div class="header-logo">
-            <span class="logo-icon">📊</span>
-            <div class="logo-text">
-                <h1>MONIKA</h1>
-                <p>Monopoli Statistika</p>
-            </div>
-        </div>
-        
-        <div class="header-center-info">
-            <div class="header-stat-item">
-                <i class="fa-solid fa-clock"></i>
-                <span id="game-duration">00:00:00</span>
-            </div>
-            <div class="header-stat-separator"></div>
-            <div class="header-stat-item">
-                <i class="fa-solid fa-gamepad"></i>
-                <span id="header-turn-status">Giliran: Player 1</span>
-            </div>
-        </div>
-
-        <div class="header-actions">
-            <button id="btn-sound-toggle" class="header-btn" onclick="toggleMute()" title="Mute/Unmute Suara">
-                <i class="fa-solid fa-volume-high"></i>
-            </button>
-            <button class="header-btn" onclick="showHelpModal()" title="Bantuan & Aturan Main">
-                <i class="fa-solid fa-book-open"></i> Aturan
-            </button>
-            <button class="header-btn toggle-log-btn" onclick="toggleLogPanel()" title="Log Aktivitas">
-                <i class="fa-solid fa-list-ul"></i> Log
-            </button>
-        </div>
-    </header>
-
     <div class="game-wrapper">
 
     <!-- ===== LEFT PANEL: Player 1 & 2 ===== -->
@@ -257,14 +222,23 @@ session_start();
                 </div>
             </div>
 
-            <!-- Bank Mascot -->
-            <div class="cb-bank" onclick="Swal.fire({title:'🐷 Pak Bankir', html:'<div style=\'font-size:0.95rem; color:#555;\'>Selamat datang di Bank Monika!<br><br>💰 Mulai dengan <b>Rp 3.000.000</b><br>🎲 Lewati START = <b>+Rp 200.000</b><br>⭐ 3 bintang = masuk <b>Penjara</b><br>🎲 Dadu 6 = bebas dari penjara!</div>',icon:'info',confirmButtonText:'Mengerti!'})">
-                <div class="cb-bank-body">
-                    <i class="fa-solid fa-piggy-bank cb-bank-icon"></i>
-                    <div class="cb-bank-info">
-                        <span class="cb-bank-name">Pak Bankir</span>
-                        <span class="cb-bank-tagline">Klik untuk info 💰</span>
-                    </div>
+            <!-- ===== CENTER BOARD DASHBOARD ===== -->
+            <div class="cb-dashboard">
+                <div class="cb-dashboard-timer" title="Durasi Permainan">
+                    <i class="fa-solid fa-clock"></i>
+                    <span id="game-duration">00:00:00</span>
+                </div>
+                <div class="cb-dashboard-divider"></div>
+                <div class="cb-dashboard-actions">
+                    <button id="btn-sound-toggle" class="cb-dashboard-btn" onclick="toggleMute()" title="Mute/Unmute Suara">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                    <button class="cb-dashboard-btn" onclick="showHelpModal()" title="Bantuan & Aturan Main">
+                        <i class="fa-solid fa-book-open"></i> Aturan
+                    </button>
+                    <button class="cb-dashboard-btn" onclick="Swal.fire({title:'💰 Informasi Bank', html:'<div style=\'font-size:0.95rem; color:#f1f5f9; text-align:left; line-height: 1.6;\'><ul style=\'padding-left:16px; margin:0;\'><li>💰 Modal awal: <b>Rp 3.000.000</b></li><li>🚀 Lewati START: <b>+Rp 200.000</b></li><li>⭐ 3x bintang salah kuis: masuk <b>Penjara</b></li><li>🎲 Dadu 6 di penjara: <b>Bebas!</b></li></ul></div>',icon:'info',confirmButtonText:'Mengerti!',customClass:{popup:'swal-card-stats'}})" title="Informasi Bank & Nilai Awal">
+                        <i class="fa-solid fa-circle-info"></i> Info Bank
+                    </button>
                 </div>
             </div>
 
@@ -311,25 +285,7 @@ session_start();
 </div>
 </div>
 
-<!-- ===== FLOATING GAME LOG PANEL ===== -->
-<div id="game-log-panel" class="game-log-panel minimized">
-    <div class="log-header">
-        <span><i class="fa-solid fa-list-ul me-2"></i>Log Aktivitas</span>
-        <div class="log-header-actions">
-            <button onclick="clearGameLogs()" title="Bersihkan Log" class="log-action-btn"><i class="fa-solid fa-trash-can"></i></button>
-            <button onclick="toggleLogPanel()" title="Tutup Log" class="log-action-btn"><i class="fa-solid fa-chevron-down"></i></button>
-        </div>
-    </div>
-    <div id="game-log-list" class="log-body">
-        <div class="log-placeholder">Belum ada aktivitas. Kocok dadu untuk memulai!</div>
-    </div>
-</div>
 
-<!-- Toggle Log Floating Button (ketika panel ditutup) -->
-<button id="floating-log-toggle" class="floating-log-toggle" onclick="toggleLogPanel()" title="Buka Log Aktivitas">
-    <i class="fa-solid fa-list-ul"></i>
-    <span class="badge bg-danger d-none" id="log-unread-badge">0</span>
-</button>
 
 <!-- ===== HELP MODAL ===== -->
 <div id="help-modal" class="custom-modal-overlay d-none" onclick="closeHelpModalOnOuterClick(event)">

@@ -67,73 +67,10 @@ function closeHelpModalOnOuterClick(e) {
     }
 }
 
-// Activity Log System
-function logGameEvent(message, type = 'system', playerId = null) {
-    const logList = document.getElementById('game-log-list');
-    if (!logList) return;
-    
-    // Hapus placeholder jika ada
-    const placeholder = logList.querySelector('.log-placeholder');
-    if (placeholder) placeholder.remove();
-    
-    const timeStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    
-    const logItem = document.createElement('div');
-    logItem.className = `log-item ${playerId !== null ? 'p-' + playerId : type}`;
-    
-    let icon = '⚙️';
-    if (type === 'dice') icon = '🎲';
-    else if (type === 'buy') icon = '💰';
-    else if (type === 'build') icon = '🔨';
-    else if (type === 'rent') icon = '💸';
-    else if (type === 'jail') icon = '🚔';
-    else if (type === 'card') icon = '🎫';
-    else if (type === 'statistika') icon = '📊';
-    
-    logItem.innerHTML = `
-        <span class="log-item-time">${timeStr}</span>
-        <strong>${icon}</strong> ${message}
-    `;
-    
-    logList.appendChild(logItem);
-    logList.scrollTop = logList.scrollHeight;
-    
-    // Perbarui badge unread jika panel minimized
-    const panel = document.getElementById('game-log-panel');
-    if (panel && panel.classList.contains('minimized')) {
-        unreadLogsCount++;
-        const badge = document.getElementById('log-unread-badge');
-        if (badge) {
-            badge.textContent = unreadLogsCount;
-            badge.classList.remove('d-none');
-            badge.classList.add('animate__animated', 'animate__bounceIn');
-        }
-    }
-}
-
-function toggleLogPanel() {
-    const panel = document.getElementById('game-log-panel');
-    const floatToggle = document.getElementById('floating-log-toggle');
-    if (!panel) return;
-    
-    if (panel.classList.contains('minimized')) {
-        panel.classList.remove('minimized');
-        if (floatToggle) floatToggle.classList.add('d-none');
-        unreadLogsCount = 0;
-        const badge = document.getElementById('log-unread-badge');
-        if (badge) badge.classList.add('d-none');
-    } else {
-        panel.classList.add('minimized');
-        if (floatToggle) floatToggle.classList.remove('d-none');
-    }
-}
-
-function clearGameLogs() {
-    const logList = document.getElementById('game-log-list');
-    if (logList) {
-        logList.innerHTML = `<div class="log-placeholder">Log dibersihkan. Giliran berjalan akan terus mencatat!</div>`;
-    }
-}
+// Activity Log System (Disabled for performance optimization)
+function logGameEvent(message, type = 'system', playerId = null) {}
+function toggleLogPanel() {}
+function clearGameLogs() {}
 
 // Group names map helper
 function getGroupNameByColor(color) {
@@ -280,13 +217,6 @@ function updateUI() {
     document.getElementById('stock-hotel').innerText = stockHotel;
 
     let p = players[currentTurn];
-
-    // Update turn status in header
-    const headerTurn = document.getElementById('header-turn-status');
-    if (headerTurn) {
-        headerTurn.textContent = `Giliran: Player ${currentTurn + 1}`;
-        headerTurn.style.color = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b'][currentTurn];
-    }
 
     players.forEach(player => {
         // If bankrupt, render bankrupt overlay and skip further rendering
