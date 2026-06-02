@@ -203,12 +203,11 @@ function updateStarIndicator(playerId) {
     if (el) {
         const p = players[playerId];
         const stars = p.stars || 0;
-        el.innerHTML = '';
-        for (let i = 0; i < 3; i++) {
-            const star = document.createElement('i');
-            star.className = i < stars ? 'fa-solid fa-star star-red-filled' : 'fa-solid fa-star star-empty';
-            el.appendChild(star);
-        }
+        el.innerHTML = `
+            <span class="red-stars-val" style="color: #ef4444; font-weight: bold; font-size: 0.9rem; filter: drop-shadow(0 0 3px rgba(239,68,68,0.6)); margin-right: 8px;">
+                <i class="fa-solid fa-star"></i> ${stars}
+            </span>
+        `;
     }
     const blueEl = document.getElementById(`blue-stars-p${playerId}`);
     if (blueEl) {
