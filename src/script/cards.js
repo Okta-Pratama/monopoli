@@ -587,7 +587,7 @@ function drawCard(type, p, onComplete) {
                         left: 50%;
                         transform: translate(-50%, -50%);
                         width: 90%;
-                        height: 180px;
+                        height: 260px;
                         display: flex;
                         align-items: center;
                         justify-content: center;
@@ -595,16 +595,16 @@ function drawCard(type, p, onComplete) {
                         pointer-events: none;
                     ">
                         ${cardDetails.customIcon === 'redstar2' ? `
-                            <div style="display: flex; gap: 15px; justify-content: center; align-items: center;">
-                                <img src="../public/images/card/icon-card/redstar1.png" style="height: 140px; width: auto; object-fit: contain;">
-                                <img src="../public/images/card/icon-card/redstar1.png" style="height: 140px; width: auto; object-fit: contain;">
+                            <div style="display: flex; gap: 20px; justify-content: center; align-items: center;">
+                                <img src="../public/images/card/icon-card/redstar1.png" style="height: 200px !important; width: auto !important; object-fit: contain !important;">
+                                <img src="../public/images/card/icon-card/redstar1.png" style="height: 200px !important; width: auto !important; object-fit: contain !important;">
                             </div>
                         ` : `
                             <img src="../public/images/card/icon-card/${cardDetails.customIcon}" style="
-                                height: 180px;
-                                width: auto;
-                                max-width: 90%;
-                                object-fit: contain;
+                                height: 240px !important;
+                                width: auto !important;
+                                max-width: 90% !important;
+                                object-fit: contain !important;
                             ">
                         `}
                     </div>

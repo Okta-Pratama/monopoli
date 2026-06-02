@@ -19,12 +19,12 @@ function rollAndMove(p) {
     playSfx(sfx.dice);
 
     let rollInterval = setInterval(() => {
-        diceIcon.className = `fa-solid ${dCls[Math.floor(Math.random() * 6)]} text-secondary`;
+        diceIcon.className = `fa-solid ${dCls[Math.floor(Math.random() * 6)]} cb-dice-icon text-secondary`;
         rollCount++;
         if (rollCount > 10) {
             clearInterval(rollInterval);
             let finalDice = Math.floor(Math.random() * 6) + 1;
-            diceIcon.className = `fa-solid ${dCls[finalDice - 1]} ${pColors[p.id]} animate__animated animate__bounceIn`;
+            diceIcon.className = `fa-solid ${dCls[finalDice - 1]} cb-dice-icon ${pColors[p.id]} animate__animated animate__bounceIn`;
             logGameEvent(`Player ${p.id + 1} mengocok dadu dan mendapat angka <b>${finalDice}</b>.`, 'dice', p.id);
 
             let step = 0;

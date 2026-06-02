@@ -372,12 +372,13 @@ body{background:radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);font
   z-index:5;
 }
 
-/* Decorative diagonal stripes pattern */
+/* Decorative diagonal stripes pattern & Mathematical Chalkboard Doodles */
 .tile::before{
   content:'';
   position:absolute;
   top:0;left:0;right:0;bottom:0;
-  background:
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill='%230f172a' fill-opacity='0.45'%3E%3Cpath d='M10 20 L20 20 M15 15 L15 25' stroke='%230f172a' stroke-width='1.8' opacity='0.85'/%3E%3Ctext x='40' y='25' font-family='serif' font-size='11' font-style='italic' font-weight='900' opacity='0.9'%3Ef(x)%3C/text%3E%3Ctext x='15' y='55' font-family='serif' font-size='13' font-weight='900' opacity='0.9'%3E%26%23931%3B%3C/text%3E%3Cpath d='M45 45 L55 45 M50 40 L50 50' stroke='%230f172a' stroke-width='1.5' opacity='0.75'/%3E%3Cpath d='M75 15 L85 25 M85 15 L75 25' stroke='%230f172a' stroke-width='1.8' opacity='0.85'/%3E%3Ctext x='70' y='55' font-family='serif' font-size='13' font-style='italic' font-weight='900' opacity='0.9'%3E%26%23960%3B%3C/text%3E%3Cpath d='M15 85 L25 78 L35 88 L50 80' fill='none' stroke='%230f172a' stroke-width='1.8' opacity='0.85'/%3E%3Ctext x='78' y='85' font-family='sans-serif' font-size='11' font-weight='900' opacity='0.9'%3E%25%3C/text%3E%3Ccircle cx='75' cy='75' r='5' fill='none' stroke='%230f172a' stroke-width='1.5' opacity='0.75'/%3E%3C/g%3E%3C/svg%3E"),
     repeating-linear-gradient(
       45deg,
       transparent,
@@ -385,7 +386,7 @@ body{background:radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);font
       var(--tile-color, #94a3b8) 6px,
       var(--tile-color, #94a3b8) 7px
     );
-  opacity:0.06;
+  opacity:0.58;
   z-index:0;
   pointer-events:none;
 }
@@ -407,19 +408,31 @@ body{background:radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);font
 .tile-name,.tile-price,.house-indicator,.tile-color-bar,.tile-emoji{position:relative;z-index:2;}
 .fallback-icon{display:none;}
 
-/* ===== TILE EMOJI (Subtle decoration) ===== */
+/* ===== TILE EMOJI & PREMIUM VECTOR ICON BADGES ===== */
 .tile-emoji{
-  font-size:1.15rem;
+  font-size:1.2rem;
   line-height:1;
-  opacity:0.35;
+  opacity:0.85;
   z-index:2;
-  margin:1px 0;
-  transition:transform 0.3s ease, opacity 0.3s ease;
+  margin:2px 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events:none;
 }
+.tile-emoji i {
+  font-size:1.25rem !important;
+  opacity:0.95 !important;
+  filter:drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25)) !important;
+  transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
 .tile:hover .tile-emoji{
-  transform:translateY(-3px);
-  opacity:0.55;
+  transform:translateY(-3px) scale(1.18);
+  opacity:1;
+}
+.tile:hover .tile-emoji i {
+  filter:drop-shadow(0 0 10px currentColor) !important;
 }
 
 .tile-name{
@@ -2139,5 +2152,74 @@ body{background:radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);font
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* ========== GLOBAL CINEMATIC GAME BACKGROUND OVERLAY ========== */
+.game-bg-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -10;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Glowing fluid organic aurora spheres */
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.08; /* Subtle atmosphere so it remains background text-friendly */
+  pointer-events: none;
+}
+
+.orb-1 {
+  width: 600px;
+  height: 600px;
+  top: -10%;
+  left: -5%;
+  background: #3b82f6;
+  animation: slowFloat 28s infinite alternate ease-in-out;
+}
+
+.orb-2 {
+  width: 550px;
+  height: 550px;
+  bottom: -10%;
+  right: -5%;
+  background: #ec4899;
+  animation: slowFloat 35s infinite alternate ease-in-out 5s;
+}
+
+.orb-3 {
+  width: 450px;
+  height: 450px;
+  top: 35%;
+  right: 25%;
+  background: #10b981;
+  animation: slowFloat 24s infinite alternate ease-in-out;
+}
+
+@keyframes slowFloat {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(70px, -50px) scale(1.15); }
+  100% { transform: translate(-40px, 60px) scale(0.9); }
+}
+
+/* Blueprint / Scientific technical grid overlay */
+.bg-grid-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.012) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1.5px, transparent 1.5px);
+  background-size: 55px 55px;
+  opacity: 0.9;
+  pointer-events: none;
 }
 

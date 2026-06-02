@@ -21,6 +21,14 @@ session_start();
 </head>
 <body>
 
+<!-- Cinematic Game Background Overlay -->
+<div class="game-bg-overlay">
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+    <div class="bg-grid-lines"></div>
+</div>
+
 <script>
     const BOARD = <?= json_encode($board) ?>;
     const QUESTIONS = <?= json_encode($questions) ?>;
@@ -184,17 +192,45 @@ session_start();
         // Emoji map for each tile
         $tileEmojis = [
             0 => '🚀', // START
-            1 => '🏘️', 2 => '🌪️', 3 => '🏡', 4 => '🚔',
-            5 => '🚂', 6 => '🌿', 7 => '🌸', 8 => '🎓', 9 => '🏭',
+            1 => 'fa-solid fa-house-chimney text-warning', // Properti Coklat
+            2 => 'fa-solid fa-wind text-info', // Peristiwa Alam
+            3 => 'fa-solid fa-house text-warning', // Properti Coklat
+            4 => 'fa-solid fa-scale-balanced text-danger', // Pajak
+            5 => 'fa-solid fa-train-subway text-secondary', // Bandara/Stasiun
+            6 => 'fa-solid fa-leaf text-success', // Properti Teal
+            7 => 'fa-solid fa-clover text-success', // Taman Bunga
+            8 => 'fa-solid fa-graduation-cap text-primary', // Properti Teal
+            9 => 'fa-solid fa-industry text-secondary', // Properti Teal
             10 => '⛓️', // Penjara
-            11 => '🦐', 12 => '📚', 13 => '🏔️', 14 => '🎭',
-            15 => '✈️', 16 => '⛩️', 17 => '🌪️', 18 => '🏛️', 19 => '🌋',
+            11 => 'fa-solid fa-shrimp text-danger', // Properti Pink
+            12 => 'fa-solid fa-book-open text-info', // Properti Pink
+            13 => 'fa-solid fa-mountain text-secondary', // Properti Pink
+            14 => 'fa-solid fa-masks-theater text-warning', // Properti Rose
+            15 => 'fa-solid fa-plane text-primary', // Bandara
+            16 => 'fa-solid fa-torii-gate text-danger', // Properti Rose
+            17 => 'fa-solid fa-wind text-info', // Peristiwa Alam
+            18 => 'fa-solid fa-monument text-secondary', // Properti Rose
+            19 => 'fa-solid fa-volcano text-danger', // Properti Merah
             20 => '🅿️', // Bebas Parkir
-            21 => '🦈', 22 => '🌸', 23 => '🏖️', 24 => '🌺',
-            25 => '✈️', 26 => '⛵', 27 => '🐠', 28 => '💻', 29 => '⛏️',
+            21 => 'fa-solid fa-fish text-primary', // Properti Merah
+            22 => 'fa-solid fa-clover text-success', // Taman Bunga
+            23 => 'fa-solid fa-umbrella-beach text-warning', // Properti Merah
+            24 => 'fa-solid fa-tree text-success', // Properti Lime
+            25 => 'fa-solid fa-plane text-primary', // Bandara
+            26 => 'fa-solid fa-ship text-info', // Properti Lime
+            27 => 'fa-solid fa-otter text-secondary', // Properti Lime
+            28 => 'fa-solid fa-laptop text-primary', // Properti Hijau
+            29 => 'fa-solid fa-screwdriver-wrench text-secondary', // Properti Hijau
             30 => '🚨', // Masuk Penjara
-            31 => '🛢️', 32 => '🌊', 33 => '🌪️', 34 => '💠',
-            35 => '✈️', 36 => '🌸', 37 => '🌉', 38 => '🏦', 39 => '🕌',
+            31 => 'fa-solid fa-droplet text-info', // Properti Hijau
+            32 => 'fa-solid fa-water text-primary', // Properti Violet
+            33 => 'fa-solid fa-wind text-info', // Peristiwa Alam
+            34 => 'fa-solid fa-shapes text-warning', // Properti Violet
+            35 => 'fa-solid fa-plane text-primary', // Bandara
+            36 => 'fa-solid fa-clover text-success', // Taman Bunga
+            37 => 'fa-solid fa-bridge text-secondary', // Properti Violet
+            38 => 'fa-solid fa-building-columns text-danger', // Pajak/Bank
+            39 => 'fa-solid fa-mosque text-warning', // Properti Coklat
         ];
         
         $tileQuizConfig = [
@@ -276,7 +312,13 @@ session_start();
                 <i class="fa-solid <?= $iconClass ?> fallback-icon"></i>
                 <div class="tile-overlay"></div>
                 <?php if ($side !== 'corner'): ?>
-                    <div class="tile-emoji"><?= $emoji ?></div>
+                    <div class="tile-emoji">
+                        <?php if (strpos($emoji, 'fa-') !== false): ?>
+                            <i class="<?= $emoji ?>"></i>
+                        <?php else: ?>
+                            <?= $emoji ?>
+                        <?php endif; ?>
+                    </div>
                 <?php endif; ?>
                 <div class="house-indicator" id="houses-<?= $index ?>"></div>
                 <?php if($barColor): ?>
