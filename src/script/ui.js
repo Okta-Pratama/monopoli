@@ -100,6 +100,7 @@ function hexToRgb(hex) {
 
 // ========== AUTO ROLL TIMER — detik ==========
 function startAutoRoll() {
+    clearAutoRoll();
     rollCountdown = 3;
     updateRollButton();
     autoRollInterval = setInterval(() => {
@@ -141,6 +142,7 @@ function clearAutoRoll() {
 // ========== ACTION PHASE TIMER — 60 detik setelah kocok dadu ==========
 function startActionTimer() {
     clearActionTimer();
+    isActionTimeout = false;
     actionCountdown = 60;
     updateActionTimerDisplay();
     showActionTimerBar();
@@ -150,6 +152,13 @@ function startActionTimer() {
         updateActionTimerDisplay();
         if (actionCountdown <= 0) {
             clearActionTimer();
+            isActionTimeout = true;
+            
+            // Add red star silently for timing out
+            if (typeof addWarningStars === 'function') {
+                addWarningStars(players[currentTurn], 1, true);
+            }
+
             // Force close any open SweetAlert dialog
             Swal.close();
             Swal.fire({

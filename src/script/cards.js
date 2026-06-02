@@ -109,6 +109,7 @@ function triggerStatsQuestion(p, tileIndex, onComplete) {
         allowOutsideClick: false,
         confirmButtonText: 'Kunci Jawaban'
     }).then((res) => {
+        if (isActionTimeout) return;
         if (res.value && res.value.toLowerCase().trim() == q.jawaban_kunci.toLowerCase().trim()) {
             // Jawaban benar — tambah bintang biru
             p.blueStars = (p.blueStars || 0) + 1;
@@ -243,6 +244,7 @@ function triggerSpecialCardQuiz(p, tileIndex, onComplete) {
             allowOutsideClick: false,
             confirmButtonText: 'Kunci Jawaban'
         }).then((res) => {
+            if (isActionTimeout) return;
             if (res.value && res.value.toLowerCase().trim() == q.jawaban_kunci.toLowerCase().trim()) {
                 // Jawaban benar — KARTU BAGUS!
                 p.blueStars = (p.blueStars || 0) + 2;
@@ -496,6 +498,7 @@ function teleportAndSolveDialog(p, isDoubleReward = false) {
                         allowOutsideClick: false,
                         confirmButtonText: 'Kunci Jawaban'
                     }).then((answerRes) => {
+                        if (isActionTimeout) return;
                         if (answerRes.value && answerRes.value.toLowerCase().trim() == q.jawaban_kunci.toLowerCase().trim()) {
                             p.blueStars = (p.blueStars || 0) + 2;
                             updateStarIndicator(p.id);
@@ -694,6 +697,7 @@ function drawCard(type, p, onComplete) {
         allowOutsideClick: false,
         confirmButtonText: 'Ambil'
     }).then(() => {
+        if (isActionTimeout) return;
         logGameEvent(`Player ${p.id + 1} menarik Kartu <b>${cardDetails.title}</b>: "${cardDetails.text}"`, 'card', p.id);
         
         let isAsyncAction = false;

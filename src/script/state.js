@@ -47,3 +47,5 @@ let autoRollInterval;
 let rollCountdown = 3;
 let actionTimerInterval;
 let actionCountdown = ACTION_COUNTDOWN;
+let isActionTimeout = false;
+
