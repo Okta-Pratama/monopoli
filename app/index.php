@@ -555,7 +555,6 @@ session_start();
 <script src="../src/script/ui.js?v=<?= time() ?>"></script>
 <script src="../src/script/cards.js?v=<?= time() ?>"></script>
 <script src="../src/script/property.js?v=<?= time() ?>"></script>
-<script src="../src/script/jail.js?v=<?= time() ?>"></script>
 <script src="../src/script/turn.js?v=<?= time() ?>"></script>
 <script src="../src/script/main.js?v=<?= time() ?>"></script>
 

@@ -289,9 +289,6 @@ function updateUI() {
         mEl.innerText = formatRp(player.money);
         mEl.className = player.money < 0 ? 'player-money text-danger' : 'player-money text-success';
 
-        // Update jail badge
-        document.getElementById(`jail-badge-${player.id}`).classList.add('d-none');
-
         // Update star indicator
         updateStarIndicator(player.id);
 
@@ -385,29 +382,6 @@ function updateUI() {
             groupHtml += `</div>`;
             invDiv.innerHTML += groupHtml;
         });
-
-        // Special Cards (Jail Cards, etc.)
-        if (player.cards.length > 0) {
-            let cardsHtml = `<div class="inventory-group">
-                <div class="inventory-group-title" style="color: #fbbf24; border-bottom-color: rgba(251, 191, 36, 0.15)">Kartu Khusus</div>`;
-            player.cards.forEach((c) => {
-                cardsHtml += `
-                    <div class="cert-card">
-                        <div class="cert-card-header" style="background-color: #fbbf24"></div>
-                        <div class="cert-card-content">
-                            <div class="cert-top-row">
-                                <div class="cert-name" style="color: #fbbf24;">🎫 ${c.nama}</div>
-                            </div>
-                            <div class="cert-status cert-status-card">
-                                <span class="cert-status-text">Kartu Bebas Penjara</span>
-                                <span class="cert-status-icon"><i class="fa-solid fa-ticket"></i></span>
-                            </div>
-                        </div>
-                    </div>`;
-            });
-            cardsHtml += `</div>`;
-            invDiv.innerHTML += cardsHtml;
-        }
     });
 
     // Board Indicators

@@ -12,7 +12,6 @@ function formatRp(val) {
 const sfx = {
     move: new Audio('../public/sfx/place.mp3'),
     door: new Audio('../public/sfx/door-opening.mp3'),
-    jail: new Audio('../public/sfx/jail.mp3'),
     build: new Audio('../public/sfx/building.mp3'),
     bell: new Audio('../public/sfx/bell.mp3'),
     dice: new Audio('../public/sfx/roll-dice.mp3'),
@@ -33,10 +32,10 @@ const pBgSoft = ['#fef2f2', '#eff6ff', '#ecfdf5', '#fffbeb'];
 const pNames  = ['Player 1', 'Player 2', 'Player 3', 'Player 4'];
 
 let players = [
-    { id: 0, pos: 0, money: 3000, properties: [], cards: [], stars: 0, blueStars: 0, inJail: false, jailTurns: 0, isBankrupt: false },
-    { id: 1, pos: 0, money: 3000, properties: [], cards: [], stars: 0, blueStars: 0, inJail: false, jailTurns: 0, isBankrupt: false },
-    { id: 2, pos: 0, money: 3000, properties: [], cards: [], stars: 0, blueStars: 0, inJail: false, jailTurns: 0, isBankrupt: false },
-    { id: 3, pos: 0, money: 3000, properties: [], cards: [], stars: 0, blueStars: 0, inJail: false, jailTurns: 0, isBankrupt: false }
+    { id: 0, pos: 0, money: 3000, properties: [], cards: [], stars: 0, blueStars: 0, isBankrupt: false },
+    { id: 1, pos: 0, money: 3000, properties: [], cards: [], stars: 0, blueStars: 0, isBankrupt: false },
+    { id: 2, pos: 0, money: 3000, properties: [], cards: [], stars: 0, blueStars: 0, isBankrupt: false },
+    { id: 3, pos: 0, money: 3000, properties: [], cards: [], stars: 0, blueStars: 0, isBankrupt: false }
 ];
 
 let currentTurn = 0;

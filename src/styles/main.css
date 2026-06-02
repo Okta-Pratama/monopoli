@@ -980,12 +980,6 @@ body{background:radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);font
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.65), 0 0 30px rgba(59, 130, 246, 0.25) !important;
 }
 
-.swal-jail-popup {
-  border: 2px solid rgba(139, 92, 246, 0.4) !important;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.65), 0 0 30px rgba(139, 92, 246, 0.25) !important;
-  border-radius: 24px !important;
-}
-
 /* Override inner card text for stats card so it has high visibility on dark theme */
 .swal-card-stats .stat-inner-card {
   color: #f8fafc !important;
