@@ -14,8 +14,10 @@ function handleTileClick(tileIndex) {
     } else if (tile.owner !== undefined && tile.owner !== p.id && !tile.mortgaged) {
         viewOtherProperty(tileIndex, p.id);
     } else if (tile.owner === undefined && tile.harga > 0) {
-        if (p.pos === tileIndex && p.money >= tile.harga) {
-            triggerStatsQuestion(p, tileIndex);
+        if (p.pos === tileIndex) {
+            triggerStatsQuestion(p, tileIndex, () => {
+                promptBuyProperty(p, tileIndex);
+            });
         } else {
             Swal.fire({
                 title: tile.nama,
@@ -189,4 +191,41 @@ function offerProperty(buyerId, sellerId, tileIndex) {
             });
         }
     });
+}
+
+function promptBuyProperty(p, tileIndex, onComplete) {
+    let tile = BOARD[tileIndex];
+    if (tile.owner !== undefined) {
+        if (typeof onComplete === 'function') onComplete();
+        return;
+    }
+    
+    if (p.money >= tile.harga) {
+        Swal.fire({
+            title: `Beli Properti`,
+            text: `Beli ${tile.nama} seharga ${formatRp(tile.harga)}?`,
+            showCancelButton: true,
+            confirmButtonText: `Beli`,
+            cancelButtonText: 'Lewati'
+        }).then((b) => {
+            if (b.isConfirmed) {
+                p.money -= tile.harga;
+                tile.owner = p.id;
+                p.properties.push(tile);
+                playSfx(sfx.buy);
+                logGameEvent(`Player ${p.id + 1} membeli <b>${tile.nama}</b> seharga ${formatRp(tile.harga)}.`, 'buy', p.id);
+                Swal.fire('Sukses!', `${tile.nama} berhasil dibeli!`, 'success').then(() => {
+                    updateUI();
+                    if (typeof onComplete === 'function') onComplete();
+                });
+            } else {
+                updateUI();
+                if (typeof onComplete === 'function') onComplete();
+            }
+        });
+    } else {
+        Swal.fire('Uang Kurang', `Uang Anda (${formatRp(p.money)}) kurang untuk membeli ${tile.nama} seharga ${formatRp(tile.harga)}.`, 'info').then(() => {
+            if (typeof onComplete === 'function') onComplete();
+        });
+    }
 }

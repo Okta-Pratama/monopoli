@@ -17,7 +17,7 @@ session_start();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <link rel="stylesheet" href="/src/styles/main.css">
+    <link rel="stylesheet" href="../src/styles/main.css?v=<?= time() ?>">
 </head>
 <body>
 
@@ -28,7 +28,8 @@ session_start();
 
 <!-- ===== INTRO / SPLASH SCREEN ===== -->
 <div id="intro-screen" class="intro-screen">
-    <div class="intro-card animate__animated animate__zoomIn">
+    <!-- Phase 1: Splash Welcome Card -->
+    <div id="intro-main-card" class="intro-card animate__animated animate__zoomIn">
         <div class="intro-logo">📊</div>
         <h1 class="intro-title">MONIKA</h1>
         <p class="intro-subtitle">Monopoli Statistika</p>
@@ -41,6 +42,51 @@ session_start();
             🚀 MULAI PERMAINAN
         </button>
     </div>
+
+    <!-- Phase 2: Rules Booklet Card -->
+    <div id="intro-rules-card" class="intro-card rules-card d-none animate__animated">
+        <h2 class="rules-title"><i class="fa-solid fa-book-open text-primary me-2"></i>BUKU PANDUAN MONIKA</h2>
+        <div class="rules-tabs-container">
+            <button class="rules-tab-btn active" onclick="switchRulesTab(0)">📘 Aturan Dasar</button>
+            <button class="rules-tab-btn" onclick="switchRulesTab(1)">⭐ Kuis & Bintang</button>
+            <button class="rules-tab-btn" onclick="switchRulesTab(2)">🃏 Kartu Keberuntungan</button>
+        </div>
+        <div class="rules-content-box">
+            <!-- Tab 0 content -->
+            <div id="rules-tab-content-0" class="rules-tab-content">
+                <h5>💰 Modal Awal & Putaran</h5>
+                <p>Setiap pemain dibekali modal awal sebesar <strong>Rp 3.000.000</strong>. Kelilingi papan monopoli, lewati petak <strong>START</strong> untuk mendapatkan bonus gaji sebesar <strong>Rp 200.000</strong>.</p>
+                <h5>🏢 Monopoli & Bangunan</h5>
+                <p>Kuasai semua daerah dalam satu kelompok warna untuk dapat membangun rumah dan hotel guna melipatgandakan biaya sewa pemain lawan.</p>
+            </div>
+            <!-- Tab 1 content -->
+            <div id="rules-tab-content-1" class="rules-tab-content d-none">
+                <h5>📊 Kuis Statistika Wajib</h5>
+                <p>Untuk membeli properti kosong, Anda wajib menjawab pertanyaan <strong>Statistika</strong> sesuai kategori (Mean, Median, Modus, Kuartil, Jangkauan) dan tingkat kesulitan (1-4) pada petak tersebut.</p>
+                <h5>🚨 Peringatan Bintang Merah</h5>
+                <p>Jika jawaban Anda salah, Anda mendapatkan <strong>1 Bintang Merah</strong>. Jika terkumpul <strong>3 Bintang Merah</strong>, Anda akan dikenakan denda otomatis sebesar <strong>Rp 200.000</strong>.</p>
+            </div>
+            <!-- Tab 2 content -->
+            <div id="rules-tab-content-2" class="rules-tab-content d-none">
+                <h5>🃏 Kartu Keberuntungan (Petak 10 & 30)</h5>
+                <p>Saat mendarat di petak <strong>Taman Bunga (10)</strong> atau <strong>Peristiwa Alam (30)</strong>, Anda akan memilih 1 dari 3 kartu rahasia. Kategori materi terlihat di belakang kartu, namun level dan efek baik/buruk masih rahasia!</p>
+                <ul>
+                    <li>✅ <strong>BENAR (Kartu Bagus)</strong>: Mendapat reward kuis + bonus Rp 150.000!</li>
+                    <li>❌ <strong>SALAH (Kartu Jelek)</strong>: Denda Rp 100.000 + 1 bintang merah!</li>
+                </ul>
+            </div>
+        </div>
+        <button id="btn-confirm-rules" class="intro-start-btn" onclick="confirmRulesAndStartCountdown()" style="background: linear-gradient(135deg, #10b981, #059669); margin-top: 15px;">
+            🎮 SAYA SIAP BERMAIN!
+        </button>
+    </div>
+</div>
+
+<!-- ===== DRAMATIC COUNTDOWN OVERLAY ===== -->
+<div id="countdown-overlay" class="countdown-overlay d-none">
+    <div class="countdown-ring"></div>
+    <div id="countdown-number" class="countdown-number">3</div>
+    <div id="countdown-text" class="countdown-text">Mempersiapkan Papan Permainan...</div>
 </div>
 
 <div class="app-container">
@@ -65,10 +111,17 @@ session_start();
                             <span id="jail-badge-<?= $i ?>" class="jail-badge d-none"><i class="fa-solid fa-bars-staggered"></i> JAIL</span>
                         </div>
                         <div class="player-money" id="money-p<?= $i ?>">Rp 3.000.000</div>
-                        <div class="star-indicator" id="stars-p<?= $i ?>">
-                            <span class="star-empty">☆</span>
-                            <span class="star-empty">☆</span>
-                            <span class="star-empty">☆</span>
+                        <div class="stars-row" style="display: flex; gap: 8px; align-items: center; margin-top: 2px;">
+                            <div class="star-indicator" id="stars-p<?= $i ?>" title="Bintang Merah (Peringatan)">
+                                <span class="star-empty">☆</span>
+                                <span class="star-empty">☆</span>
+                                <span class="star-empty">☆</span>
+                            </div>
+                            <div class="blue-stars-container" id="blue-stars-p<?= $i ?>" title="Bintang Biru (Bonus)">
+                                <span class="blue-stars-val" style="color: #3b82f6; font-weight: bold; font-size: 0.9rem;">
+                                    <i class="fa-solid fa-star"></i> 0
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -84,19 +137,62 @@ session_start();
         // Emoji map for each tile
         $tileEmojis = [
             0 => '🚀', // START
-            1 => '🏘️', 2 => '💎', 3 => '🏡', 4 => '🚔',
-            5 => '🚂', 6 => '🌿', 7 => '❓', 8 => '🎓', 9 => '🏭',
+            1 => '🏘️', 2 => '🌪️', 3 => '🏡', 4 => '🚔',
+            5 => '🚂', 6 => '🌿', 7 => '🌸', 8 => '🎓', 9 => '🏭',
             10 => '⛓️', // Penjara
             11 => '🦐', 12 => '📚', 13 => '🏔️', 14 => '🎭',
-            15 => '✈️', 16 => '⛩️', 17 => '💎', 18 => '🏛️', 19 => '🌋',
+            15 => '✈️', 16 => '⛩️', 17 => '🌪️', 18 => '🏛️', 19 => '🌋',
             20 => '🅿️', // Bebas Parkir
-            21 => '🦈', 22 => '❓', 23 => '🏖️', 24 => '🌺',
+            21 => '🦈', 22 => '🌸', 23 => '🏖️', 24 => '🌺',
             25 => '✈️', 26 => '⛵', 27 => '🐠', 28 => '💻', 29 => '⛏️',
             30 => '🚨', // Masuk Penjara
-            31 => '🛢️', 32 => '🌊', 33 => '💎', 34 => '💠',
-            35 => '✈️', 36 => '❓', 37 => '🌉', 38 => '🏦', 39 => '🕌',
+            31 => '🛢️', 32 => '🌊', 33 => '🌪️', 34 => '💠',
+            35 => '✈️', 36 => '🌸', 37 => '🌉', 38 => '🏦', 39 => '🕌',
         ];
         
+        $tileQuizConfig = [
+            1 => ['cat' => 'R', 'level' => 1],
+            2 => ['cat' => 'M', 'level' => 1],
+            3 => ['cat' => 'J', 'level' => 2],
+            4 => ['cat' => 'D', 'level' => 2],
+            5 => ['cat' => 'R', 'level' => 1],
+            6 => ['cat' => 'K', 'level' => 2],
+            7 => ['cat' => 'J', 'level' => 1],
+            8 => ['cat' => 'D', 'level' => 2],
+            9 => ['cat' => 'M', 'level' => 1],
+            // 10: Special (Taman Bunga)
+            11 => ['cat' => 'R', 'level' => 2],
+            12 => ['cat' => 'K', 'level' => 3],
+            13 => ['cat' => 'M', 'level' => 2],
+            14 => ['cat' => 'D', 'level' => 4],
+            15 => ['cat' => 'J', 'level' => 3],
+            16 => ['cat' => 'R', 'level' => 2],
+            17 => ['cat' => 'M', 'level' => 4],
+            18 => ['cat' => 'D', 'level' => 3],
+            19 => ['cat' => 'K', 'level' => 2],
+            // 20: No kuis
+            21 => ['cat' => 'M', 'level' => 3],
+            22 => ['cat' => 'J', 'level' => 2],
+            23 => ['cat' => 'K', 'level' => 1],
+            24 => ['cat' => 'D', 'level' => 2],
+            25 => ['cat' => 'M', 'level' => 2],
+            26 => ['cat' => 'J', 'level' => 2],
+            27 => ['cat' => 'R', 'level' => 2],
+            28 => ['cat' => 'J', 'level' => 3],
+            29 => ['cat' => 'K', 'level' => 2],
+            // 30: Special (Peristiwa Alam)
+            31 => ['cat' => 'M', 'level' => 2],
+            32 => ['cat' => 'D', 'level' => 3],
+            33 => ['cat' => 'R', 'level' => 3],
+            34 => ['cat' => 'K', 'level' => 4],
+            35 => ['cat' => 'M', 'level' => 3],
+            36 => ['cat' => 'R', 'level' => 4],
+            37 => ['cat' => 'D', 'level' => 1],
+            38 => ['cat' => 'J', 'level' => 4],
+            39 => ['cat' => 'K', 'level' => 1]
+        ];
+
+
         foreach ($board as $index => $petak): 
             $iconClass = 'fa-star';
             if ($petak['tipe'] === 'properti') $iconClass = 'fa-building';
@@ -132,16 +228,30 @@ session_start();
             <div class="tile tile-<?= $index ?> <?= $petak['tipe'] ?> side-<?= $side ?>" id="tile-<?= $index ?>" data-side="<?= $side ?>" onclick="handleTileClick(<?= $index ?>)" style="--tile-color: <?= $barColor ?: '#94a3b8' ?>;">
                 <i class="fa-solid <?= $iconClass ?> fallback-icon"></i>
                 <div class="tile-overlay"></div>
-                <div class="tile-emoji"><?= $emoji ?></div>
+                <?php if ($side !== 'corner'): ?>
+                    <div class="tile-emoji"><?= $emoji ?></div>
+                <?php endif; ?>
                 <div class="house-indicator" id="houses-<?= $index ?>"></div>
                 <?php if($barColor): ?>
                     <div class="tile-color-bar" style="background-color: <?= $barColor ?>"></div>
                 <?php endif; ?>
-                <div class="tile-name">
-                    <?= $petak['nama'] ?>
-                </div>
+                <?php if ($side !== 'corner'): ?>
+                    <div class="tile-name">
+                        <?= $petak['nama'] ?>
+                    </div>
+                <?php endif; ?>
                 <?php if($petak['harga'] > 0): ?>
                     <div class="tile-price"><?= formatRp($petak['harga']) ?></div>
+                <?php endif; ?>
+                <?php if (isset($tileQuizConfig[$index])): ?>
+                    <div class="tile-star-icon">
+                        <?php for ($s = 0; $s < $tileQuizConfig[$index]['level']; $s++): ?>
+                            <i class="fa-solid fa-star"></i>
+                        <?php endfor; ?>
+                    </div>
+                    <div class="tile-code">
+                        <?= $tileQuizConfig[$index]['cat'] . $tileQuizConfig[$index]['level'] ?>
+                    </div>
                 <?php endif; ?>
             </div>
         <?php endforeach; ?>
@@ -155,31 +265,19 @@ session_start();
             <div class="cb-corner-ornament cb-bl"></div>
             <div class="cb-corner-ornament cb-br"></div>
 
-            <!-- Game Title -->
-            <div class="cb-title-section">
-                <div class="cb-title-frame">
-                    <div class="cb-title-badge">📊</div>
-                    <h1 class="cb-title">MONIKA</h1>
-                    <p class="cb-subtitle">Monopoli Statistika</p>
-                </div>
-            </div>
+
 
             <!-- Card Decks -->
             <div class="cb-card-decks">
-                <div class="cb-deck cb-deck-chance" onclick="Swal.fire('Info', 'Kartu Kesempatan akan terbuka otomatis jika Anda mendarat di petaknya.', 'info')">
+                <div class="cb-deck cb-deck-chance" onclick="Swal.fire('Info', 'Kartu Taman Bunga akan terbuka otomatis jika Anda mendarat di petaknya.', 'info')">
                     <div class="cb-deck-glow"></div>
-                    <div class="cb-deck-icon"><i class="fa-solid fa-question"></i></div>
-                    <span class="cb-deck-label">KESEMPATAN</span>
+                    <div class="cb-deck-icon"><i class="fa-solid fa-leaf"></i></div>
+                    <span class="cb-deck-label">TAMAN BUNGA</span>
                 </div>
-                <div class="cb-deck cb-deck-stats" onclick="Swal.fire('Info', 'Klik tanah kosong di papan untuk membelinya (Akan menarik kartu Statistika).', 'info')">
+                <div class="cb-deck cb-deck-chest" onclick="Swal.fire('Info', 'Kartu Peristiwa Alam akan terbuka otomatis jika Anda mendarat di petaknya.', 'info')">
                     <div class="cb-deck-glow"></div>
-                    <div class="cb-deck-icon"><i class="fa-solid fa-brain"></i></div>
-                    <span class="cb-deck-label">STATISTIKA</span>
-                </div>
-                <div class="cb-deck cb-deck-chest" onclick="Swal.fire('Info', 'Kartu Dana Umum akan terbuka otomatis jika Anda mendarat di petaknya.', 'info')">
-                    <div class="cb-deck-glow"></div>
-                    <div class="cb-deck-icon"><i class="fa-solid fa-gift"></i></div>
-                    <span class="cb-deck-label">DANA UMUM</span>
+                    <div class="cb-deck-icon"><i class="fa-solid fa-bolt"></i></div>
+                    <span class="cb-deck-label">PERISTIWA ALAM</span>
                 </div>
             </div>
 
@@ -270,10 +368,17 @@ session_start();
                             <span id="jail-badge-<?= $i ?>" class="jail-badge d-none"><i class="fa-solid fa-bars-staggered"></i> JAIL</span>
                         </div>
                         <div class="player-money" id="money-p<?= $i ?>">Rp 3.000.000</div>
-                        <div class="star-indicator" id="stars-p<?= $i ?>">
-                            <span class="star-empty">☆</span>
-                            <span class="star-empty">☆</span>
-                            <span class="star-empty">☆</span>
+                        <div class="stars-row" style="display: flex; gap: 8px; align-items: center; margin-top: 2px;">
+                            <div class="star-indicator" id="stars-p<?= $i ?>" title="Bintang Merah (Peringatan)">
+                                <span class="star-empty">☆</span>
+                                <span class="star-empty">☆</span>
+                                <span class="star-empty">☆</span>
+                            </div>
+                            <div class="blue-stars-container" id="blue-stars-p<?= $i ?>" title="Bintang Biru (Bonus)">
+                                <span class="blue-stars-val" style="color: #3b82f6; font-weight: bold; font-size: 0.9rem;">
+                                    <i class="fa-solid fa-star"></i> 0
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -305,7 +410,7 @@ session_start();
                 <p>Untuk membeli tanah kosong yang Anda darati, Anda harus menjawab pertanyaan <strong>Statistika</strong> terlebih dahulu:</p>
                 <ul>
                     <li><strong>Jawaban Benar:</strong> Anda berhak membeli tanah tersebut dan mendapatkan poin/reward uang tunai tambahan.</li>
-                    <li><strong>Jawaban Salah:</strong> Anda mendapatkan <strong>1 Bintang Peringatan</strong>. Anda tetap boleh membeli tanah tersebut dengan harga normal, namun jika Anda mengumpulkan <strong>3 Bintang</strong>, Anda akan otomatis masuk <strong>Penjara</strong>.</li>
+                    <li><strong>Jawaban Salah:</strong> Anda mendapatkan <strong>1 Bintang Peringatan</strong>. Anda tetap boleh membeli tanah tersebut dengan harga normal, namun jika Anda mengumpulkan <strong>3 Bintang</strong>, Anda akan dikenakan denda otomatis sebesar <strong>Rp 200.000</strong>.</li>
                 </ul>
             </div>
             
@@ -315,13 +420,8 @@ session_start();
             </div>
 
             <div class="rule-section">
-                <h5><i class="fa-solid fa-bars-staggered text-warning me-2"></i>Keluar dari Penjara</h5>
-                <p>Jika berada di penjara, Anda dapat bebas dengan cara:</p>
-                <ul>
-                    <li>Membayar denda sebesar <strong>Rp 50.000</strong> di awal giliran.</li>
-                    <li>Mencoba mengocok dadu dan mendapatkan angka <strong>6</strong> (kesempatan 3 putaran).</li>
-                    <li>Menggunakan Kartu Bebas Penjara jika memilikinya.</li>
-                </ul>
+                <h5><i class="fa-solid fa-triangle-exclamation text-danger me-2"></i>Denda 3x Salah Jawab Soal</h5>
+                <p>Setiap kali Anda menjawab kuis dengan salah, Anda mendapat bintang peringatan. Jika mengumpulkan <strong>3 Bintang Peringatan</strong>, sistem akan mendenda Anda secara otomatis sebesar <strong>Rp 200.000</strong>, lalu bintang peringatan Anda akan di-reset kembali ke nol.</p>
             </div>
         </div>
         <div class="custom-modal-footer">
@@ -330,13 +430,13 @@ session_start();
     </div>
 </div>
 
-<script src="/src/script/state.js"></script>
-<script src="/src/script/ui.js"></script>
-<script src="/src/script/cards.js"></script>
-<script src="/src/script/property.js"></script>
-<script src="/src/script/jail.js"></script>
-<script src="/src/script/turn.js"></script>
-<script src="/src/script/main.js"></script>
+<script src="../src/script/state.js?v=<?= time() ?>"></script>
+<script src="../src/script/ui.js?v=<?= time() ?>"></script>
+<script src="../src/script/cards.js?v=<?= time() ?>"></script>
+<script src="../src/script/property.js?v=<?= time() ?>"></script>
+<script src="../src/script/jail.js?v=<?= time() ?>"></script>
+<script src="../src/script/turn.js?v=<?= time() ?>"></script>
+<script src="../src/script/main.js?v=<?= time() ?>"></script>
 
 </body>
 </html>

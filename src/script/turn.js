@@ -5,34 +5,11 @@
 
 function processTurn() {
     clearAutoRoll();
+    hasRolled = true;
+    canEndTurn = false;
+    updateUI();
     let p = players[currentTurn];
-    document.getElementById('btn-roll').disabled = true;
-
-    if (p.inJail) {
-        let hasJailCard = p.cards.find(c => c.type === 'free_jail');
-        let jailOpts = `
-            <div style="display:flex; flex-direction:column; gap:10px; padding:10px;">
-                <button class="btn btn-warning fw-bold" onclick="payJail(${p.id})" style="border-radius:12px; padding:12px;">
-                    <i class="fa-solid fa-money-bill-wave me-2"></i>Bayar Denda ${formatRp(50)}
-                </button>
-                <button class="btn btn-primary fw-bold" onclick="rollDiceJail(${p.id})" style="border-radius:12px; padding:12px;">
-                    <i class="fa-solid fa-dice me-2"></i>Kocok Dadu (Butuh angka 6!)
-                </button>
-                ${hasJailCard ? `<button class="btn btn-info fw-bold text-white" onclick="useJailCard(${p.id})" style="border-radius:12px; padding:12px;"><i class="fa-solid fa-ticket me-2"></i>Pakai Kartu Bebas</button>` : ''}
-                <button class="btn btn-outline-danger fw-bold mt-2" onclick="skipJailTurn(${p.id})" style="border-radius:12px; padding:12px;">
-                    <i class="fa-solid fa-forward me-2"></i>Lewati Giliran (${p.jailTurns}/2)
-                </button>
-            </div>`;
-        Swal.fire({
-            title: '<i class="fa-solid fa-bars-staggered me-2"></i>Terkurung di Penjara!',
-            html: jailOpts,
-            showConfirmButton: false,
-            allowOutsideClick: false,
-            customClass: { popup: 'swal-jail-popup' }
-        });
-    } else {
-        rollAndMove(p);
-    }
+    rollAndMove(p);
 }
 
 function rollAndMove(p) {
@@ -80,33 +57,134 @@ function rollAndMove(p) {
     }, 80);
 }
 
-function handleTileLogic(p, tile) {
-    if (p.pos === 30) {
-        p.pos = 10;
-        p.inJail = true;
-        p.jailTurns = 0;
-        playSfx(sfx.jail);
+function movePlayerAnimate(p, steps, onComplete) {
+    let step = 0;
+    let dir = steps > 0 ? 1 : -1;
+    let absSteps = Math.abs(steps);
+    
+    if (absSteps === 0) {
+        if (typeof onComplete === 'function') onComplete();
+        return;
+    }
+    
+    let stepInterval = setInterval(() => {
+        step++;
+        p.pos = (p.pos + dir + 40) % 40;
+        playSfx(sfx.move);
+        
+        if (dir === 1 && p.pos === 0) {
+            p.money += 200;
+            updateUI();
+            logGameEvent(`Player ${p.id + 1} melewati START dan mendapat bonus ${formatRp(200)}.`, 'buy', p.id);
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                title: `🎉 Lewat START! +${formatRp(200)}`,
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 2500
+            });
+        }
+        
         updatePawnPositions();
-        updateUI();
-        logGameEvent(`Player ${p.id + 1} dijebloskan ke Penjara!`, 'jail', p.id);
-        Swal.fire({
-            title: '🚔 Masuk Penjara!',
-            text: 'Kamu langsung ditangkap dan masuk penjara!',
-            icon: 'error',
-            confirmButtonText: 'OK'
+        
+        if (step === absSteps) {
+            clearInterval(stepInterval);
+            setTimeout(() => {
+                if (typeof onComplete === 'function') onComplete();
+            }, 400);
+        }
+    }, 300);
+}
+
+function teleportPlayer(p, targetPos, onComplete) {
+    p.pos = targetPos;
+    playSfx(sfx.move);
+    updatePawnPositions();
+    setTimeout(() => {
+        if (typeof onComplete === 'function') onComplete();
+    }, 400);
+}
+
+function handleTileLogic(p, tile) {
+    let tileIndex = BOARD.indexOf(tile);
+    if (tileIndex !== 0 && tileIndex !== 20) {
+        triggerStatsQuestion(p, tileIndex, () => {
+            executeActualTileLogic(p, tile);
         });
-    } else if (tile.tipe === 'pajak') {
+    } else {
+        executeActualTileLogic(p, tile);
+    }
+}
+
+function executeActualTileLogic(p, tile) {
+    let tileIndex = BOARD.indexOf(tile);
+    if (tile.tipe === 'pajak') {
         p.money -= tile.harga;
         playSfx(sfx.bell);
         updateUI();
         logGameEvent(`Player ${p.id + 1} membayar Pajak sebesar ${formatRp(tile.harga)}.`, 'rent', p.id);
-        Swal.fire('Denda!', `Kamu bayar ${formatRp(tile.harga)}`, 'error');
+        Swal.fire('Denda!', `Kamu bayar ${formatRp(tile.harga)}`, 'error').then(() => {
+            canEndTurn = true;
+            updateUI();
+        });
     } else if (tile.tipe === 'kesempatan' || tile.tipe === 'dana_umum') {
-        drawCard(tile.tipe, p);
+        if (tile.tipe === 'kesempatan' && p.blockTamanBunga) {
+            p.blockTamanBunga = false; // Reset flag
+            logGameEvent(`Player ${p.id + 1} kehilangan kesempatan mengambil Kartu Taman Bunga!`, 'system', p.id);
+            Swal.fire({
+                title: 'Kesempatan Diblokir!',
+                text: 'Kamu kehilangan kesempatan mengambil Kartu Taman Bunga akibat efek Kartu Bencana Alam!',
+                icon: 'warning',
+                confirmButtonText: 'Lanjutkan'
+            }).then(() => {
+                canEndTurn = true;
+                updateUI();
+            });
+        } else if (tile.tipe === 'kesempatan' && p.doubleTamanBunga) {
+            p.doubleTamanBunga = false; // Reset flag
+            logGameEvent(`Player ${p.id + 1} mengambil 2x Kartu Taman Bunga!`, 'card', p.id);
+            Swal.fire({
+                title: 'Double Draw!',
+                text: 'Kamu mendapat bonus mengambil 2 Kartu Taman Bunga sekaligus!',
+                icon: 'success',
+                confirmButtonText: 'Ambil Kartu 1'
+            }).then(() => {
+                drawCard('kesempatan', p, () => {
+                    setTimeout(() => {
+                        Swal.fire({
+                            title: 'Double Draw!',
+                            text: 'Sekarang ambil Kartu Taman Bunga kedua!',
+                            icon: 'success',
+                            confirmButtonText: 'Ambil Kartu 2'
+                        }).then(() => {
+                            drawCard('kesempatan', p);
+                        });
+                    }, 1000);
+                });
+            });
+        } else if (tile.tipe === 'dana_umum' && p.skipPeristiwaAlam) {
+            p.skipPeristiwaAlam = false; // Reset flag
+            logGameEvent(`Player ${p.id + 1} melewati Peristiwa Alam berkat imunitas Kartu Taman Bunga!`, 'system', p.id);
+            Swal.fire({
+                title: 'Bencana Terlewati!',
+                text: 'Kamu selamat dari Peristiwa Alam berkat imunitas Kartu Taman Bunga!',
+                icon: 'success',
+                confirmButtonText: 'Lanjutkan'
+            }).then(() => {
+                canEndTurn = true;
+                updateUI();
+            });
+        } else {
+            drawCard(tile.tipe, p);
+        }
     } else if (tile.tipe === 'properti' || tile.tipe === 'bandara' || tile.tipe === 'utilitas') {
         if (tile.owner !== undefined && tile.owner !== p.id) {
             if (tile.mortgaged) {
-                Swal.fire('Bebas Sewa', 'Properti sedang digadaikan.', 'info');
+                Swal.fire('Bebas Sewa', 'Properti sedang digadaikan.', 'info').then(() => {
+                    canEndTurn = true;
+                    updateUI();
+                });
             } else {
                 let rent = tile.sewa || 25;
                 if (tile.houses) rent += (tile.houses * 20);
@@ -115,13 +193,25 @@ function handleTileLogic(p, tile) {
                 playSfx(sfx.bell);
                 updateUI();
                 logGameEvent(`Player ${p.id + 1} membayar sewa ${formatRp(rent)} ke Player ${tile.owner + 1} di <b>${tile.nama}</b>.`, 'rent', p.id);
-                Swal.fire('Bayar Sewa!', `Membayar ${formatRp(rent)} ke Player ${tile.owner + 1}`, 'warning');
+                Swal.fire('Bayar Sewa!', `Membayar ${formatRp(rent)} ke Player ${tile.owner + 1}`, 'warning').then(() => {
+                    canEndTurn = true;
+                    updateUI();
+                });
             }
-        } else if (tile.owner === undefined && p.money >= tile.harga) {
-            triggerStatsQuestion(p, BOARD.indexOf(tile));
+        } else if (tile.owner === undefined) {
+            promptBuyProperty(p, tileIndex, () => {
+                canEndTurn = true;
+                updateUI();
+            });
+        } else {
+            canEndTurn = true;
+            updateUI();
         }
+    } else {
+        // Start or other corners (jail, free parking)
+        canEndTurn = true;
+        updateUI();
     }
-    updateUI();
 }
 
 function declareBankrupt() {
@@ -158,14 +248,59 @@ function promptEndTurn() {
 
 function endTurn() {
     clearActionTimer();
+    
+    let p = players[currentTurn];
+    if (p.extraTurn && !p.isBankrupt) {
+        p.extraTurn = false; // Reset flag
+        logGameEvent(`Player ${p.id + 1} mendapatkan Bonus Jalan 2x!`, 'system', p.id);
+        
+        hasRolled = false;
+        canEndTurn = false;
+        updateUI();
+        
+        Swal.fire({
+            title: `🎲 BONUS JALAN 2x!`,
+            text: `Kamu mendapat giliran tambahan!`,
+            icon: 'success',
+            background: pBgSoft[currentTurn],
+            confirmButtonText: 'Mulai Main'
+        }).then(() => {
+            startAutoRoll();
+        });
+        return;
+    }
+
     document.getElementById(`ui-p${currentTurn}`).classList.remove('active-turn');
-    do { currentTurn = (currentTurn + 1) % 4; } while (players[currentTurn].isBankrupt);
+    
+    let loopCount = 0;
+    do {
+        currentTurn = (currentTurn + 1) % 4;
+        loopCount++;
+        
+        if (players[currentTurn].skipNextTurn && !players[currentTurn].isBankrupt) {
+            players[currentTurn].skipNextTurn = false; // Reset flag
+            logGameEvent(`Giliran Player ${currentTurn + 1} dilewati karena efek Kartu Bencana Alam!`, 'system', currentTurn);
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                title: `🔇 Player ${currentTurn + 1} Lewat Giliran!`,
+                icon: 'warning',
+                showConfirmButton: false,
+                timer: 3000
+            });
+        } else {
+            if (!players[currentTurn].isBankrupt) {
+                break;
+            }
+        }
+    } while (loopCount < 8);
 
     document.getElementById(`ui-p${currentTurn}`).classList.add('active-turn');
     document.getElementById('turn-indicator').innerText = `GILIRAN PLAYER ${currentTurn + 1}`;
     document.getElementById('turn-indicator').className = `turn-indicator-text fw-bold mb-1 ${pColors[currentTurn]}`;
 
     hasRolled = false;
+    canEndTurn = false;
     updateUI();
 
     const playerIcons = ['fa-chess-pawn', 'fa-chess-knight', 'fa-chess-rook', 'fa-chess-queen'];

@@ -200,14 +200,25 @@ function hideActionTimerBar() {
 // ========== STAR INDICATOR ==========
 function updateStarIndicator(playerId) {
     const el = document.getElementById(`stars-p${playerId}`);
-    if (!el) return;
-    const p = players[playerId];
-    const stars = p.stars || 0;
-    el.innerHTML = '';
-    for (let i = 0; i < 3; i++) {
-        const star = document.createElement('i');
-        star.className = i < stars ? 'fa-solid fa-star star-filled' : 'fa-solid fa-star star-empty';
-        el.appendChild(star);
+    if (el) {
+        const p = players[playerId];
+        const stars = p.stars || 0;
+        el.innerHTML = '';
+        for (let i = 0; i < 3; i++) {
+            const star = document.createElement('i');
+            star.className = i < stars ? 'fa-solid fa-star star-red-filled' : 'fa-solid fa-star star-empty';
+            el.appendChild(star);
+        }
+    }
+    const blueEl = document.getElementById(`blue-stars-p${playerId}`);
+    if (blueEl) {
+        const p = players[playerId];
+        const blueStars = p.blueStars || 0;
+        blueEl.innerHTML = `
+            <span class="blue-stars-val" style="color: #3b82f6; font-weight: bold; font-size: 0.9rem; filter: drop-shadow(0 0 3px rgba(59,130,246,0.6));">
+                <i class="fa-solid fa-star"></i> ${blueStars}
+            </span>
+        `;
     }
 }
 
@@ -280,7 +291,7 @@ function updateUI() {
         mEl.className = player.money < 0 ? 'player-money text-danger' : 'player-money text-success';
 
         // Update jail badge
-        document.getElementById(`jail-badge-${player.id}`).classList.toggle('d-none', !player.inJail);
+        document.getElementById(`jail-badge-${player.id}`).classList.add('d-none');
 
         // Update star indicator
         updateStarIndicator(player.id);
@@ -436,20 +447,28 @@ function updateUI() {
             btnBank.classList.add('d-none');
         } else {
             btnRoll.classList.add('d-none');
-            if (p.money < 0) {
-                let totalAssets = calculateAssets(p.id);
-                if (p.money + totalAssets < 0) {
-                    btnEnd.classList.add('d-none');
-                    btnBank.classList.remove('d-none');
+            if (canEndTurn) {
+                if (p.money < 0) {
+                    let totalAssets = calculateAssets(p.id);
+                    if (p.money + totalAssets < 0) {
+                        btnEnd.classList.add('d-none');
+                        btnBank.classList.remove('d-none');
+                    } else {
+                        btnEnd.disabled = true;
+                        btnEnd.innerText = '⚠️ LUNASI HUTANG!';
+                        btnEnd.classList.remove('d-none');
+                        btnBank.classList.add('d-none');
+                    }
                 } else {
-                    btnEnd.disabled = true;
-                    btnEnd.innerText = '⚠️ LUNASI HUTANG!';
+                    btnEnd.disabled = false;
+                    btnEnd.innerText = '✅ AKHIRI GILIRAN';
                     btnEnd.classList.remove('d-none');
                     btnBank.classList.add('d-none');
                 }
             } else {
-                btnEnd.disabled = false;
-                btnEnd.innerText = '✅ AKHIRI GILIRAN';
+                // Movement or kuis is still in progress
+                btnEnd.disabled = true;
+                btnEnd.innerText = '⏳ PROSES GILIRAN...';
                 btnEnd.classList.remove('d-none');
                 btnBank.classList.add('d-none');
             }
@@ -508,39 +527,117 @@ function updatePawnPositions(isIntro = false) {
 }
 
 function startGameWithIntro() {
-    // Play intro sound (door opening)
-    if (typeof playSfx === 'function' && typeof sfx !== 'undefined' && sfx.door) {
-        playSfx(sfx.door);
+    const mainCard = document.getElementById('intro-main-card');
+    const rulesCard = document.getElementById('intro-rules-card');
+    
+    if (mainCard && rulesCard) {
+        playSfx(sfx.card);
+        mainCard.classList.add('animate__animated', 'animate__zoomOut');
+        setTimeout(() => {
+            mainCard.classList.add('d-none');
+            rulesCard.classList.remove('d-none');
+            rulesCard.classList.add('animate__animated', 'animate__zoomIn');
+        }, 450);
+    } else {
+        confirmRulesAndStartCountdown();
     }
+}
 
-    // Animate out intro screen
+function switchRulesTab(tabIdx) {
+    playSfx(sfx.move);
+    const tabBtns = document.querySelectorAll('.rules-tab-btn');
+    const tabContents = document.querySelectorAll('.rules-tab-content');
+    
+    tabBtns.forEach((btn, idx) => {
+        if (idx === tabIdx) btn.classList.add('active');
+        else btn.classList.remove('active');
+    });
+    
+    tabContents.forEach((content, idx) => {
+        if (idx === tabIdx) {
+            content.classList.remove('d-none');
+            content.classList.add('animate__animated', 'animate__fadeIn');
+        } else {
+            content.classList.add('d-none');
+        }
+    });
+}
+
+function confirmRulesAndStartCountdown() {
+    playSfx(sfx.buy);
+    
     const introScreen = document.getElementById('intro-screen');
+    const countdownOverlay = document.getElementById('countdown-overlay');
+    const countdownNum = document.getElementById('countdown-number');
+    const countdownTxt = document.getElementById('countdown-text');
+    
     if (introScreen) {
         introScreen.classList.add('animate__animated', 'animate__zoomOut');
         setTimeout(() => {
             introScreen.style.display = 'none';
-        }, 600);
+        }, 500);
     }
-
-    // Animate in app container
-    const appContainer = document.querySelector('.app-container');
-    if (appContainer) {
-        appContainer.classList.add('game-started');
+    
+    if (countdownOverlay) {
+        countdownOverlay.classList.remove('d-none');
+        
+        let seconds = 3;
+        const tickSfx = [sfx.card, sfx.card, sfx.card];
+        const statusTexts = [
+            "Mempersiapkan Dadu Keberuntungan...",
+            "Mengacak Kartu Keberuntungan...",
+            "Mempersiapkan Papan Statistika..."
+        ];
+        
+        // Staggered pawn drop in the background during countdown to avoid heavy UI load
+        setTimeout(() => {
+            const appContainer = document.querySelector('.app-container');
+            if (appContainer) appContainer.classList.add('game-started');
+            updatePawnPositions(true);
+        }, 800);
+        
+        let countdownInterval = setInterval(() => {
+            seconds--;
+            if (seconds > 0) {
+                playSfx(tickSfx[seconds - 1]);
+                if (countdownNum) {
+                    countdownNum.textContent = seconds;
+                    // Reset CSS animation to re-trigger bounce on number change
+                    countdownNum.style.animation = 'none';
+                    countdownNum.offsetHeight; /* trigger reflow */
+                    countdownNum.style.animation = 'countdown-bounce 1s infinite ease-in-out';
+                }
+                if (countdownTxt) countdownTxt.textContent = statusTexts[seconds - 1];
+            } else if (seconds === 0) {
+                playSfx(sfx.door);
+                if (countdownNum) {
+                    countdownNum.textContent = "GO!";
+                    countdownNum.style.color = "#10b981";
+                    countdownNum.style.textShadow = "0 0 30px rgba(16,185,129,0.8), 0 0 60px rgba(16,185,129,0.4)";
+                    countdownNum.style.animation = 'none';
+                    countdownNum.offsetHeight;
+                    countdownNum.style.animation = 'countdown-bounce 1s infinite ease-in-out';
+                }
+                if (countdownTxt) countdownTxt.textContent = "MEMULAI PERMAINAN!";
+            } else {
+                clearInterval(countdownInterval);
+                countdownOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    countdownOverlay.classList.add('d-none');
+                    
+                    // Re-calculate and lock pawn start positions once layout is 100% stable
+                    updatePawnPositions(false);
+                    
+                    // Fire up game timer and auto-roll loops after dramatic loading finishes
+                    initGameTimer();
+                    if (typeof logGameEvent === 'function') {
+                        logGameEvent("Permainan dimulai! Selamat datang di MONIKA (Monopoly Statistika).", "system");
+                    }
+                    if (typeof startAutoRoll === 'function') {
+                        startAutoRoll();
+                    }
+                }, 500);
+            }
+        }, 1000);
     }
-
-    // Staggered pawn drop animation
-    setTimeout(() => {
-        updatePawnPositions(true);
-    }, 400);
-
-    // Initialize timer and auto roll after animations complete
-    setTimeout(() => {
-        initGameTimer();
-        if (typeof logGameEvent === 'function') {
-            logGameEvent("Permainan dimulai! Selamat datang di MONIKA (Monopoly Statistika).", "system");
-        }
-        if (typeof startAutoRoll === 'function') {
-            startAutoRoll();
-        }
-    }, 1500);
 }

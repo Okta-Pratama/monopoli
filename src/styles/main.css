@@ -203,6 +203,7 @@ body{background:radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);font
 .star-indicator{display:flex;gap:3px;align-items:center;margin-top:2px;}
 .star-indicator .fa-star{font-size:0.75rem;transition:all 0.3s;}
 .star-filled{color:#f59e0b;filter:drop-shadow(0 0 4px rgba(245,158,11,0.8));animation:star-pop 0.3s ease;}
+.star-red-filled{color:#ef4444;filter:drop-shadow(0 0 4px rgba(239,68,68,0.8));animation:star-pop 0.3s ease;}
 .star-empty{color:#475569;opacity:0.6;}
 @keyframes star-pop{0%{transform:scale(0);}80%{transform:scale(1.3);}100%{transform:scale(1);}}
 
@@ -554,43 +555,39 @@ body{background:radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);font
 
 /* START — vibrant green */
 .tile-0{
-  background:linear-gradient(135deg,#065f46 0%,#059669 40%,#10b981 100%)!important;
+  background-image: url('../../public/images/tiles/0.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
 }
-.tile-0 .tile-name{color:#d1fae5!important;}
-.tile-0::before{
-  content:''!important;opacity:1!important;
-  background:repeating-conic-gradient(rgba(255,255,255,0.05) 0% 25%, transparent 25% 50%) 0 0 / 20px 20px!important;
-}
+.tile-0::before { display: none !important; }
 
 /* Penjara — dark orange */
 .tile-10{
-  background:linear-gradient(135deg,#7c2d12 0%,#c2410c 40%,#ea580c 100%)!important;
+  background-image: url('../../public/images/tiles/10.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
 }
-.tile-10 .tile-name{color:#ffedd5!important;}
-.tile-10::before{
-  content:''!important;opacity:1!important;
-  background:repeating-linear-gradient(0deg,rgba(0,0,0,0.08) 0px,rgba(0,0,0,0.08) 3px,transparent 3px,transparent 12px)!important;
-}
+.tile-10::before { display: none !important; }
 
 /* Bebas Parkir — deep blue */
 .tile-20{
-  background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 40%,#3b82f6 100%)!important;
+  background-image: url('../../public/images/tiles/20.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
 }
-.tile-20 .tile-name{color:#dbeafe!important;}
-.tile-20::before{
-  content:''!important;opacity:1!important;
-  background:repeating-conic-gradient(rgba(255,255,255,0.04) 0% 25%, transparent 25% 50%) 0 0 / 16px 16px!important;
-}
+.tile-20::before { display: none !important; }
 
 /* Masuk Penjara — danger red */
 .tile-30{
-  background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 40%,#dc2626 100%)!important;
+  background-image: url('../../public/images/tiles/30.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
 }
-.tile-30 .tile-name{color:#fecaca!important;}
-.tile-30::before{
-  content:''!important;opacity:1!important;
-  background:repeating-linear-gradient(45deg,rgba(0,0,0,0.06) 0px,rgba(0,0,0,0.06) 3px,transparent 3px,transparent 12px)!important;
-}
+.tile-30::before { display: none !important; }
 /* Corner shimmer animation */
 .tile.corner .tile-overlay{
   display:block!important;
@@ -629,15 +626,15 @@ body{background:radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);font
   grid-column:2/11;grid-row:2/11;
   display:flex;flex-direction:column;align-items:center;justify-content:space-between;
   padding:16px 14px;position:relative;overflow:hidden;
-  background:linear-gradient(145deg,#f8fafc 0%,#eef2f7 50%,#e2e8f0 100%);
+  background-image: url('../../public/images/board/midboard.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
 }
 
 /* Subtle dot grid pattern */
 .cb-bg-pattern{
-  position:absolute;top:0;left:0;right:0;bottom:0;
-  background-image:radial-gradient(circle,#cbd5e1 0.8px,transparent 0.8px);
-  background-size:18px 18px;
-  opacity:0.35;pointer-events:none;z-index:0;
+  display: none !important;
 }
 
 /* Corner ornaments */
@@ -669,8 +666,9 @@ body{background:radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);font
 }
 
 /* ========== CARD DECKS — Premium ========== */
+/* ========== CARD DECKS — Premium ========== */
 .cb-card-decks{
-  display:flex;gap:14px;position:relative;z-index:2;
+  display: contents;
 }
 .cb-deck{
   width:105px;height:130px;border-radius:14px;
@@ -693,10 +691,12 @@ body{background:radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);font
 @keyframes deck-shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
 
 .cb-deck-icon{
-  width:46px;height:46px;border-radius:50%;
+  width:38px !important;
+  height:38px !important;
+  border-radius:50%;
   background:rgba(255,255,255,0.2);
   display:flex;align-items:center;justify-content:center;
-  font-size:1.4rem;
+  font-size:1.1rem !important;
   border:2px solid rgba(255,255,255,0.15);
   backdrop-filter:blur(4px);
 }
@@ -705,21 +705,72 @@ body{background:radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);font
   text-shadow:0 1px 3px rgba(0,0,0,0.3);
 }
 
-/* Deck colors */
-.cb-deck-chance{background:linear-gradient(145deg,#d97706,#f59e0b,#fbbf24);}
-.cb-deck-stats{background:linear-gradient(145deg,#b91c1c,#dc2626,#ef4444);}
-.cb-deck-chest{background:linear-gradient(145deg,#1d4ed8,#3b82f6,#60a5fa);}
+/* Deck positions & styles overlaying on midboard.png graphics */
+.cb-deck-chance .cb-deck-icon,
+.cb-deck-chance .cb-deck-label,
+.cb-deck-chest .cb-deck-icon,
+.cb-deck-chest .cb-deck-label {
+  display: none !important;
+}
+
+.cb-deck-chance {
+  position: absolute !important;
+  bottom: 5.5% !important;
+  right: 5.5% !important;
+  width: 25% !important;
+  height: 16% !important;
+  background-image: url('../../public/images/card/keberuntungan/keberuntungan-belakang.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  border: 1px solid rgba(16, 185, 129, 0.6) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(6, 95, 70, 0.2) !important;
+  z-index: 10 !important;
+  transition: all 0.3s ease !important;
+}
+.cb-deck-chance:hover {
+  border: 1.5px solid rgba(16, 185, 129, 0.9) !important;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.6) !important;
+  transform: scale(1.04) !important;
+}
+
+.cb-deck-chest {
+  position: absolute !important;
+  top: 5.5% !important;
+  left: 5.5% !important;
+  width: 25% !important;
+  height: 16% !important;
+  background-image: url('../../public/images/card/peristiwa/peristiwa-belakang.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  border: 1px solid rgba(59, 130, 246, 0.6) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(29, 78, 216, 0.2) !important;
+  z-index: 10 !important;
+  transition: all 0.3s ease !important;
+}
+.cb-deck-chest:hover {
+  border: 1.5px solid rgba(59, 130, 246, 0.9) !important;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.6) !important;
+  transform: scale(1.04) !important;
+}
 
 /* ========== CONTROL CENTER ========== */
 .cb-control-center{
+  position: absolute !important;
+  top: 48% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
   display:flex;align-items:center;justify-content:center;gap:18px;
-  background:rgba(15,23,42,0.88);
+  background:rgba(15,23,42,0.92) !important;
   backdrop-filter:blur(12px);
   padding:12px 20px;border-radius:20px;
-  box-shadow:0 8px 32px rgba(0,0,0,0.25),inset 0 1px 0 rgba(255,255,255,0.08);
+  box-shadow:0 8px 32px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.08);
   border:1px solid rgba(255,255,255,0.06);
-  position:relative;z-index:2;
-  width:auto;max-width:100%;
+  z-index:15 !important;
+  width:auto;max-width:92%;
 }
 
 /* Stock indicators (orbs) */
@@ -1249,18 +1300,22 @@ body{background:radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);font
 
 /* ========== CENTER BOARD DASHBOARD ========== */
 .cb-dashboard {
+  position: absolute !important;
+  top: 63% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
   display: flex;
   align-items: center;
   gap: 16px;
-  background: rgba(15, 23, 42, 0.75);
+  background: rgba(15, 23, 42, 0.85) !important;
   backdrop-filter: blur(12px);
   padding: 8px 18px;
   border-radius: 30px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  position: relative;
-  z-index: 2;
-  margin-top: 10px;
+  z-index: 15 !important;
+  margin-top: 0px !important;
+  white-space: nowrap !important;
 }
 
 .cb-dashboard-timer {
@@ -1324,5 +1379,309 @@ body{background:radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);font
 
 .cb-dashboard-btn:active {
   transform: translateY(0);
+}
+
+/* Star icon on tiles - placed on the outer edge of each side */
+.tile-star-icon {
+  position: absolute;
+  display: flex;
+  gap: 2px;
+  font-size: 0.72rem;
+  color: #fbbf24; /* vibrant amber gold */
+  z-index: 10;
+  pointer-events: none;
+  filter: drop-shadow(0 0 3px rgba(245,158,11,0.9));
+}
+
+.tile.side-bottom .tile-star-icon {
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: star-pulse-bottom 2s infinite ease-in-out;
+}
+
+.tile.side-top .tile-star-icon {
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: star-pulse-top 2s infinite ease-in-out;
+}
+
+.tile.side-left .tile-star-icon {
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  flex-direction: column;
+  animation: star-pulse-left 2s infinite ease-in-out;
+}
+
+.tile.side-right .tile-star-icon {
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  flex-direction: column;
+  animation: star-pulse-right 2s infinite ease-in-out;
+}
+
+@keyframes star-pulse-bottom {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.85; }
+  50% { transform: translateX(-50%) scale(1.15); opacity: 1; }
+}
+
+@keyframes star-pulse-top {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.85; }
+  50% { transform: translateX(-50%) scale(1.15); opacity: 1; }
+}
+
+@keyframes star-pulse-left {
+  0%, 100% { transform: translateY(-50%) scale(1); opacity: 0.85; }
+  50% { transform: translateY(-50%) scale(1.15); opacity: 1; }
+}
+
+@keyframes star-pulse-right {
+  0%, 100% { transform: translateY(-50%) scale(1); opacity: 0.85; }
+  50% { transform: translateY(-50%) scale(1.15); opacity: 1; }
+}
+
+/* Tile question type code labels (M1, K3 etc.) - placed on the inner edge of each side inside the color bar */
+.tile-code {
+  position: absolute;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #ffffff;
+  background: rgba(15, 23, 42, 0.75); /* Dark elegant contrast inside the color bar */
+  padding: 1px 5px;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+  z-index: 5;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 0.2px;
+  pointer-events: none;
+}
+
+.tile.side-bottom .tile-code {
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.tile.side-top .tile-code {
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.tile.side-left .tile-code {
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.tile.side-right .tile-code {
+  left: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+@media (max-width: 1400px) {
+  .cb-control-center {
+    top: 48% !important;
+    transform: translate(-50%, -50%) scale(0.9) !important;
+  }
+  .cb-dashboard {
+    top: 63% !important;
+    transform: translate(-50%, -50%) scale(0.9) !important;
+  }
+}
+@media (max-width: 1200px) {
+  .cb-control-center {
+    top: 48% !important;
+    transform: translate(-50%, -50%) scale(0.8) !important;
+  }
+  .cb-dashboard {
+    top: 63% !important;
+    transform: translate(-50%, -50%) scale(0.8) !important;
+  }
+}
+
+/* Special Selection & Outcomes SweetAlert Dark Theme Card Styling */
+.swal-card-special-selection {
+  border: 4px solid #10b981 !important; /* emerald/clover green */
+  border-radius: 20px !important;
+  background: #0f172a !important; /* glassmorphic dark background */
+  padding: 24px 16px !important;
+  color: #f8fafc !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255,255,255,0.1) !important;
+}
+
+.swal-card-special-quiz {
+  border: 4px solid #fbbf24 !important; /* gold border */
+  border-radius: 20px !important;
+  background: #0f172a !important; /* dark theme */
+  padding: 24px 20px !important;
+  width: 380px !important;
+  color: #f8fafc !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255,255,255,0.1) !important;
+}
+
+.swal-card-outcome-good {
+  border: 4px solid #34d399 !important; /* bright green border */
+  border-radius: 20px !important;
+  background: #064e3b !important; /* dark green background */
+  color: #f8fafc !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6) !important;
+}
+
+.swal-card-outcome-bad {
+  border: 4px solid #f87171 !important; /* bright red border */
+  border-radius: 20px !important;
+  background: #450a0a !important; /* dark red background */
+  color: #f8fafc !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Rules Booklet Card Styles */
+.rules-card {
+  width: 520px !important;
+  max-width: 90% !important;
+  padding: 24px !important;
+  background: #0f172a !important; /* Elegant dark slate background */
+  border: 3px solid #3b82f6 !important;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.5) !important;
+  color: #f8fafc !important;
+}
+
+.rules-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #f8fafc;
+  text-align: center;
+  margin-bottom: 16px;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+.rules-tabs-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.rules-tab-btn {
+  flex: 1;
+  padding: 8px 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.25s;
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+}
+
+.rules-tab-btn.active {
+  background: #3b82f6 !important;
+  color: #ffffff !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+}
+
+.rules-content-box {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 16px;
+  min-height: 200px;
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.5;
+  color: #e2e8f0;
+}
+
+.rules-tab-content h5 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #60a5fa;
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+
+.rules-tab-content p {
+  font-size: 0.78rem;
+  margin-bottom: 12px;
+  color: #cbd5e1;
+}
+
+.rules-tab-content ul {
+  padding-left: 16px;
+  margin-bottom: 0;
+}
+
+.rules-tab-content li {
+  font-size: 0.78rem;
+  margin-bottom: 6px;
+  color: #cbd5e1;
+}
+
+/* Dramatic Countdown Overlay */
+.countdown-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle, rgba(15,23,42,0.95) 0%, rgba(2,6,23,0.98) 100%);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 0.5s ease-out;
+}
+
+.countdown-number {
+  font-size: 8rem;
+  font-weight: 900;
+  color: #3b82f6;
+  text-shadow: 0 0 30px rgba(59,130,246,0.8), 0 0 60px rgba(59,130,246,0.4);
+  font-family: 'Poppins', sans-serif;
+  animation: countdown-bounce 1s infinite ease-in-out;
+}
+
+.countdown-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-top: 20px;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.countdown-ring {
+  position: absolute;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  border: 4px solid rgba(59,130,246,0.1);
+  border-top-color: #3b82f6;
+  animation: spin 2s linear infinite;
+  box-shadow: 0 0 20px rgba(59,130,246,0.1);
+}
+
+@keyframes countdown-bounce {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.1); opacity: 1; }
+  70% { transform: scale(0.95); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
