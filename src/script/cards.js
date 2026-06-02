@@ -98,7 +98,8 @@ function triggerStatsQuestion(p, tileIndex, onComplete) {
                 <hr style="margin-top:15px; margin-bottom:15px; border-top: 2px solid #e74c3c; width: 60%; margin-left: auto; margin-right: auto;">
                 <div style="font-size: 0.8rem; color: #777; margin-bottom: 8px;">Materi: ${getCategoryDisplayName(conf.category)} (Tingkat: ${levelStr})</div>
                 <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;">${q.soal}</div>
-                <div style="font-size: 0.9rem; color: #555;">(Reward: ${formatRp(q.poin)})</div>
+                <div style="font-size: 0.9rem; color: #3b82f6; font-weight: bold;">(Reward: +1 Bintang Biru)</div>
+                <div id="swal-action-timer" style="font-size: 1.15rem; font-weight: 900; color: #fbbf24; margin-top: 15px; font-family:'Poppins',sans-serif; text-shadow: 0 0 8px rgba(251,191,36,0.3);">⏱️ 60 detik</div>
             </div>
         `,
         input: 'text',
@@ -111,13 +112,12 @@ function triggerStatsQuestion(p, tileIndex, onComplete) {
         if (res.value && res.value.toLowerCase().trim() == q.jawaban_kunci.toLowerCase().trim()) {
             // Jawaban benar — tambah bintang biru
             p.blueStars = (p.blueStars || 0) + 1;
-            p.money += q.poin;
             updateStarIndicator(p.id);
-            logGameEvent(`Player ${p.id + 1} menjawab kuis Statistika dengan <b>BENAR</b>! (Reward: ${formatRp(q.poin)}, Total Bintang Biru: ${p.blueStars})`, 'statistika', p.id);
+            logGameEvent(`Player ${p.id + 1} menjawab kuis Statistika dengan <b>BENAR</b>! (Total Bintang Biru: ${p.blueStars})`, 'statistika', p.id);
             
             Swal.fire({
                 title: 'Tepat!',
-                html: `<div>Jawaban benar! Reward ${formatRp(q.poin)} ditambahkan ke saldo Anda.</div>
+                html: `<div>Jawaban benar! Anda mendapatkan 1 Bintang Biru.</div>
                        <div style="font-size: 1.2rem; margin: 10px 0; color: #3b82f6;"><i class="fa-solid fa-star"></i> Bintang Biru Bertambah!</div>`,
                 icon: 'success',
                 confirmButtonText: 'Lanjutkan'
@@ -126,18 +126,33 @@ function triggerStatsQuestion(p, tileIndex, onComplete) {
                 if (typeof onComplete === 'function') onComplete();
             });
         } else {
-            // Jawaban salah — tambah bintang merah
-            p.stars = (p.stars || 0) + 1;
-            updateStarIndicator(p.id);
-            logGameEvent(`Player ${p.id + 1} menjawab kuis Statistika dengan <b>SALAH</b>! (Jawaban Anda: "${res.value || ''}", Kunci: "${q.jawaban_kunci}", Total Bintang Merah: ${p.stars})`, 'statistika', p.id);
+            // Jawaban salah — tambah bintang merah & cek denda lewat addWarningStars secara silent
+            logGameEvent(`Player ${p.id + 1} menjawab kuis Statistika dengan <b>SALAH</b>! (Jawaban Anda: "${res.value || ''}", Kunci: "${q.jawaban_kunci}")`, 'statistika', p.id);
 
+            let countdown = 3;
+            let countdownInterval;
             Swal.fire({
                 title: 'Salah!',
                 html: `<div>Jawaban benar: <b>${q.jawaban_kunci}</b></div>
-                       <div style="font-size: 1.2rem; margin: 10px 0; color: #ef4444;"><i class="fa-solid fa-star"></i> Bintang Merah Bertambah!</div>`,
+                       <div style="font-size: 1.2rem; margin: 10px 0; color: #ef4444;"><i class="fa-solid fa-star"></i> Bintang Merah Bertambah!</div>
+                       <div style="margin-top: 10px; font-size: 0.9rem; color: #555;">Lanjut otomatis dalam <b id="swal-countdown">${countdown}</b> detik...</div>`,
                 icon: 'warning',
-                confirmButtonText: 'Lanjutkan'
+                confirmButtonText: 'Lanjutkan',
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: () => {
+                    const countdownEl = document.getElementById('swal-countdown');
+                    countdownInterval = setInterval(() => {
+                        countdown--;
+                        if (countdownEl) countdownEl.textContent = countdown;
+                        if (countdown <= 0) clearInterval(countdownInterval);
+                    }, 1000);
+                },
+                willClose: () => {
+                    clearInterval(countdownInterval);
+                }
             }).then(() => {
+                addWarningStars(p, 1, true); // Silent because we already showed the warning!
                 updateUI();
                 if (typeof onComplete === 'function') onComplete();
             });
@@ -215,7 +230,8 @@ function triggerSpecialCardQuiz(p, tileIndex, onComplete) {
                     <hr style="margin-top:15px; margin-bottom:15px; border-top: 2px solid #fbbf24; width: 60%; margin-left: auto; margin-right: auto;">
                     <div style="font-size: 0.8rem; color: #cbd5e1; text-transform: uppercase; margin-bottom: 8px; font-family: 'Poppins', sans-serif; font-weight: 500;">Materi: ${getCategoryDisplayName(selectedCat)} (Tingkat: ${levelStr})</div>
                     <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; color: #f8fafc; line-height: 1.5; font-family: 'Poppins', sans-serif;">${q.soal}</div>
-                    <div style="font-size: 0.9rem; color: #34d399; font-weight: 700; font-family: 'Poppins', sans-serif;">(Reward Kuis: +${formatRp(q.poin)})</div>
+                    <div style="font-size: 0.9rem; color: #34d399; font-weight: 700; font-family: 'Poppins', sans-serif;">(Reward Kuis: +2 Bintang Biru)</div>
+                    <div id="swal-action-timer" style="font-size: 1.15rem; font-weight: 900; color: #fbbf24; margin-top: 15px; font-family:'Poppins',sans-serif; text-shadow: 0 0 8px rgba(251,191,36,0.3);">⏱️ 60 detik</div>
                 </div>
             `,
             input: 'text',
@@ -229,16 +245,14 @@ function triggerSpecialCardQuiz(p, tileIndex, onComplete) {
         }).then((res) => {
             if (res.value && res.value.toLowerCase().trim() == q.jawaban_kunci.toLowerCase().trim()) {
                 // Jawaban benar — KARTU BAGUS!
-                p.blueStars = (p.blueStars || 0) + 1;
-                let bonusReward = 150; // Bonus Rp 150.000
-                p.money += q.poin + bonusReward;
+                p.blueStars = (p.blueStars || 0) + 2;
                 updateStarIndicator(p.id);
-                logGameEvent(`Player ${p.id + 1} menjawab kuis spesial dengan BENAR! Mendapatkan KARTU BAGUS! (Reward: ${formatRp(q.poin + bonusReward)}, Total Bintang Biru: ${p.blueStars})`, 'statistika', p.id);
+                logGameEvent(`Player ${p.id + 1} menjawab kuis spesial dengan BENAR! Mendapatkan KARTU BAGUS! (Total Bintang Biru: ${p.blueStars})`, 'statistika', p.id);
                 
                 Swal.fire({
                     title: '🎉 KARTU BAGUS! (BENAR)',
                     html: `<div style="font-family: 'Poppins', sans-serif;">Jawaban Anda sangat tepat!</div>
-                           <div style="font-size: 1.12rem; margin-top: 12px; color:#34d399; font-weight: 800; font-family: 'Poppins', sans-serif; line-height: 1.5;">Reward Kuis: +${formatRp(q.poin)}<br>Bonus Kartu Bagus: +${formatRp(bonusReward)}</div>
+                           <div style="font-size: 1.12rem; margin-top: 12px; color:#34d399; font-weight: 800; font-family: 'Poppins', sans-serif; line-height: 1.5;">Bonus Kartu Bagus: +2 Bintang Biru</div>
                            <div style="font-size:1.2rem; margin-top:12px; color:#34d399;"><i class="fa-solid fa-star"></i> Bintang Biru Bertambah!</div>`,
                     icon: 'success',
                     background: '#064e3b',
@@ -251,38 +265,37 @@ function triggerSpecialCardQuiz(p, tileIndex, onComplete) {
                 });
             } else {
                 // Jawaban salah — KARTU JELEK!
-                p.stars = (p.stars || 0) + 1;
-                let penaltyCost = 100; // Denda Rp 100.000
-                p.money -= penaltyCost;
-                updateStarIndicator(p.id);
-                logGameEvent(`Player ${p.id + 1} menjawab kuis spesial dengan SALAH! Mendapatkan KARTU JELEK! (Denda: ${formatRp(penaltyCost)}, Total Bintang Merah: ${p.stars})`, 'statistika', p.id);
+                logGameEvent(`Player ${p.id + 1} menjawab kuis spesial dengan SALAH! Mendapatkan KARTU JELEK!`, 'statistika', p.id);
                 
+                let countdown = 3;
+                let countdownInterval;
                 Swal.fire({
                     title: '👿 KARTU JELEK! (SALAH)',
                     html: `<div style="font-family: 'Poppins', sans-serif; margin-bottom: 8px;">Jawaban benar: <b>${q.jawaban_kunci}</b></div>
-                           <div style="font-size: 1.12rem; margin-top: 12px; color:#f87171; font-weight: 800; font-family: 'Poppins', sans-serif; line-height: 1.5;">Hukuman Kartu Jelek: -${formatRp(penaltyCost)}</div>
-                           <div style="font-size: 1.2rem; margin-top: 12px; color:#f87171;"><i class="fa-solid fa-star"></i> Bintang Merah Bertambah!</div>`,
+                           <div style="font-size: 1.2rem; margin-top: 12px; color:#f87171;"><i class="fa-solid fa-star"></i> Bintang Merah Bertambah!</div>
+                           <div style="margin-top: 15px; font-size: 0.9rem; color: #94a3b8;">Lanjut otomatis dalam <b id="swal-countdown">${countdown}</b> detik...</div>`,
                     icon: 'error',
                     background: '#450a0a',
                     color: '#f8fafc',
                     customClass: { popup: 'swal-card-outcome-bad' },
-                    confirmButtonText: 'Lanjutkan'
-                }).then(() => {
-                    updateUI();
-                    if (p.money < 0) {
-                        hasRolled = true;
-                        updateUI();
-                        Swal.fire({
-                            title: 'Hutang!',
-                            text: 'Uangmu minus, segera jual aset untuk membayar hutang!',
-                            icon: 'warning',
-                            confirmButtonText: 'Mengerti'
-                        }).then(() => {
-                            if (typeof onComplete === 'function') onComplete();
-                        });
-                    } else {
-                        if (typeof onComplete === 'function') onComplete();
+                    confirmButtonText: 'Lanjutkan',
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        const countdownEl = document.getElementById('swal-countdown');
+                        countdownInterval = setInterval(() => {
+                            countdown--;
+                            if (countdownEl) countdownEl.textContent = countdown;
+                            if (countdown <= 0) clearInterval(countdownInterval);
+                        }, 1000);
+                    },
+                    willClose: () => {
+                        clearInterval(countdownInterval);
                     }
+                }).then(() => {
+                    addWarningStars(p, 1, true); // Silent check since we showed the star warning in this card popup
+                    updateUI();
+                    if (typeof onComplete === 'function') onComplete();
                 });
             }
         });
@@ -299,16 +312,40 @@ function triggerSpecialCardQuiz(p, tileIndex, onComplete) {
     });
 }
 
-function addWarningStars(p, count) {
+function addWarningStars(p, count, silent = false) {
     p.stars = (p.stars || 0) + count;
     updateStarIndicator(p.id);
     updateUI();
-    Swal.fire({
-        title: 'Bintang Merah Bertambah!',
-        html: `<div style="font-size:1.1rem; font-family:'Poppins',sans-serif;">Kamu mendapatkan bintang merah!<br><div style="font-size:1.6rem; margin:10px 0; color:#ef4444;"><i class="fa-solid fa-star"></i> +${count} Bintang Merah</div>Total Bintang Merah: ${p.stars}</div>`,
-        icon: 'warning',
-        confirmButtonText: 'Lanjutkan'
-    });
+    
+    if (!silent) {
+        let countdown = 3;
+        let countdownInterval;
+        Swal.fire({
+            title: 'Bintang Merah Bertambah!',
+            html: `<div style="font-size:1.1rem; font-family:'Poppins',sans-serif; text-align: center; color: #f1f5f9;">
+                       Kamu mendapatkan bintang merah!<br>
+                       <div style="font-size:1.8rem; margin:15px 0; color:#ef4444; font-weight:bold;"><i class="fa-solid fa-star"></i> +${count} Bintang Merah</div>
+                       Total Bintang Merah: ${p.stars}
+                       <div style="margin-top: 15px; font-size: 0.9rem; color: #94a3b8;">Lanjut otomatis dalam <b id="swal-countdown">${countdown}</b> detik...</div>
+                   </div>`,
+            icon: 'warning',
+            confirmButtonText: 'Lanjutkan',
+            customClass: { popup: 'swal-card-stats' },
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: () => {
+                const countdownEl = document.getElementById('swal-countdown');
+                countdownInterval = setInterval(() => {
+                    countdown--;
+                    if (countdownEl) countdownEl.textContent = countdown;
+                    if (countdown <= 0) clearInterval(countdownInterval);
+                }, 1000);
+            },
+            willClose: () => {
+                clearInterval(countdownInterval);
+            }
+        });
+    }
 }
 
 function giveStarsToOpponent(p, count) {
@@ -403,7 +440,7 @@ function teleportOpponentDialog(p, isFront) {
 function teleportAndSolveDialog(p, isDoubleReward = false) {
     let availableTiles = [];
     for (let i = 1; i < 40; i++) {
-        if (i !== 20) {
+        if (i !== 10 && i !== 20 && i !== 30) {
             availableTiles.push({ index: i, name: `[Petak ${i}] ${BOARD[i].nama}` });
         }
     }
@@ -416,7 +453,7 @@ function teleportAndSolveDialog(p, isDoubleReward = false) {
     `;
     
     Swal.fire({
-        title: isDoubleReward ? 'Pilih Petak (Poin 2x)' : 'Pilih Petak & Jawab Soal',
+        title: isDoubleReward ? 'Pilih Petak (Bintang 2x)' : 'Pilih Petak & Jawab Soal',
         html: html,
         icon: 'question',
         showCancelButton: false,
@@ -448,7 +485,8 @@ function teleportAndSolveDialog(p, isDoubleReward = false) {
                                 <hr style="margin-top:15px; margin-bottom:15px; border-top: 2px solid #10b981; width: 60%; margin-left: auto; margin-right: auto;">
                                 <div style="font-size: 0.8rem; color: #777; margin-bottom: 8px;">Materi: ${getCategoryDisplayName(conf.category)} (Tingkat: ${levelStr})</div>
                                 <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;">${q.soal}</div>
-                                <div style="font-size: 0.9rem; color: #10b981; font-weight: bold;">(Reward Ganda: +${formatRp(q.poin * 2)})</div>
+                                <div style="font-size: 0.9rem; color: #10b981; font-weight: bold;">(Reward Ganda: +2 Bintang Biru)</div>
+                                <div id="swal-action-timer" style="font-size: 1.15rem; font-weight: 900; color: #fbbf24; margin-top: 15px; font-family:'Poppins',sans-serif; text-shadow: 0 0 8px rgba(251,191,36,0.3);">⏱️ 60 detik</div>
                             </div>
                         `,
                         input: 'text',
@@ -459,24 +497,47 @@ function teleportAndSolveDialog(p, isDoubleReward = false) {
                         confirmButtonText: 'Kunci Jawaban'
                     }).then((answerRes) => {
                         if (answerRes.value && answerRes.value.toLowerCase().trim() == q.jawaban_kunci.toLowerCase().trim()) {
-                            p.blueStars = (p.blueStars || 0) + 1;
-                            p.money += q.poin * 2;
+                            p.blueStars = (p.blueStars || 0) + 2;
                             updateStarIndicator(p.id);
-                            logGameEvent(`Player ${p.id + 1} menjawab kuis bonus dengan BENAR! (Reward Ganda: +${formatRp(q.poin * 2)}, Total Bintang Biru: ${p.blueStars})`, 'statistika', p.id);
+                            logGameEvent(`Player ${p.id + 1} menjawab kuis bonus dengan BENAR! (Reward Ganda: +2 Bintang Biru, Total Bintang Biru: ${p.blueStars})`, 'statistika', p.id);
                             
                             Swal.fire({
                                 title: 'Luar Biasa!',
-                                text: `Jawaban benar! Reward ganda +${formatRp(q.poin * 2)} ditambahkan ke saldo Anda.`,
+                                text: `Jawaban benar! Anda mendapatkan +2 Bintang Biru.`,
                                 icon: 'success',
                                 confirmButtonText: 'Lanjutkan'
                             }).then(() => {
                                 executeActualTileLogic(p, BOARD[tileIdx]);
                             });
                         } else {
-                            addWarningStars(p, 1);
-                            setTimeout(() => {
+                            logGameEvent(`Player ${p.id + 1} menjawab kuis bonus dengan SALAH! (Jawaban Anda: "${answerRes.value || ''}", Kunci: "${q.jawaban_kunci}")`, 'statistika', p.id);
+
+                            let countdown = 3;
+                            let countdownInterval;
+                            Swal.fire({
+                                title: 'Salah!',
+                                html: `<div>Jawaban benar: <b>${q.jawaban_kunci}</b></div>
+                                       <div style="font-size: 1.2rem; margin: 10px 0; color: #ef4444;"><i class="fa-solid fa-star"></i> Bintang Merah Bertambah!</div>
+                                       <div style="margin-top: 10px; font-size: 0.9rem; color: #555;">Lanjut otomatis dalam <b id="swal-countdown">${countdown}</b> detik...</div>`,
+                                icon: 'warning',
+                                confirmButtonText: 'Lanjutkan',
+                                timer: 3000,
+                                timerProgressBar: true,
+                                didOpen: () => {
+                                    const countdownEl = document.getElementById('swal-countdown');
+                                    countdownInterval = setInterval(() => {
+                                        countdown--;
+                                        if (countdownEl) countdownEl.textContent = countdown;
+                                        if (countdown <= 0) clearInterval(countdownInterval);
+                                    }, 1000);
+                                },
+                                willClose: () => {
+                                    clearInterval(countdownInterval);
+                                }
+                            }).then(() => {
+                                addWarningStars(p, 1, true); // Silent
                                 executeActualTileLogic(p, BOARD[tileIdx]);
-                            }, 1500);
+                            });
                         }
                     });
                 } else {
@@ -525,8 +586,8 @@ function drawCard(type, p, onComplete) {
     }
 
     let baseFrontImg = isTaman 
-        ? '../public/images/card/keberuntungan/keberuntungan-depan.png' 
-        : '../public/images/card/peristiwa/peristiwa-depan.png';
+        ? '../public/images/card/keberuntungan/peristiwa-depan.png' 
+        : '../public/images/card/peristiwa/keberuntungan-depan.png';
         
     Swal.fire({
         html: `
@@ -646,11 +707,6 @@ function drawCard(type, p, onComplete) {
             cardDetails.action();
         }
         updateUI();
-        if (p.money < 0) {
-            hasRolled = true;
-            Swal.fire('Hutang!', 'Uangmu minus, segera jual aset untuk membayar hutang!', 'warning');
-            updateUI();
-        }
         
         if (!isAsyncAction) {
             canEndTurn = true;

@@ -185,6 +185,19 @@ function updateActionTimerDisplay() {
         barEl.style.width = `${pct}%`;
         barEl.className = actionCountdown <= 10 ? 'action-timer-progress action-timer-bar-urgent' : 'action-timer-progress';
     }
+    
+    // Live update for timer element inside SweetAlert
+    const swalTimerEl = document.getElementById('swal-action-timer');
+    if (swalTimerEl) {
+        swalTimerEl.textContent = `⏱️ ${actionCountdown} detik`;
+        if (actionCountdown <= 10) {
+            swalTimerEl.style.color = '#ef4444';
+            swalTimerEl.style.textShadow = '0 0 10px rgba(239, 68, 68, 0.6)';
+        } else {
+            swalTimerEl.style.color = '#fbbf24';
+            swalTimerEl.style.textShadow = '0 0 8px rgba(251, 191, 36, 0.3)';
+        }
+    }
 }
 
 function showActionTimerBar() {
@@ -221,73 +234,45 @@ function updateStarIndicator(playerId) {
     }
 }
 
+function initGameTimer() {
+    gameStartTime = Date.now();
+    clearInterval(gameTimerInterval);
+    const durationLimit = 15 * 60 * 1000; // 15 minutes in ms
+    gameTimerInterval = setInterval(() => {
+        const elapsed = Date.now() - gameStartTime;
+        const remaining = Math.max(0, durationLimit - elapsed);
+        const mins = Math.floor(remaining / 60000).toString().padStart(2, '0');
+        const secs = Math.floor((remaining % 60000) / 1000).toString().padStart(2, '0');
+        const timerEl = document.getElementById('game-duration');
+        if (timerEl) {
+            timerEl.textContent = `${mins}:${secs}`;
+        }
+        if (remaining <= 0) {
+            clearInterval(gameTimerInterval);
+            endGame();
+        }
+    }, 1000);
+}
+
 // ========== UI UPDATE ==========
 function updateUI() {
-    document.getElementById('stock-rumah').innerText = stockRumah;
-    document.getElementById('stock-hotel').innerText = stockHotel;
-
     let p = players[currentTurn];
 
     players.forEach(player => {
-        // If bankrupt, render bankrupt overlay and skip further rendering
         const sectionEl = document.getElementById(`ui-p${player.id}`);
-        if (player.isBankrupt) {
-            if (sectionEl) {
-                sectionEl.classList.add('bankrupt-ui');
-                let overlay = sectionEl.querySelector('.bankrupt-overlay-banner');
-                if (!overlay) {
-                    overlay = document.createElement('div');
-                    overlay.className = 'bankrupt-overlay-banner';
-                    overlay.innerHTML = `<div class="bankrupt-badge-banner">BANKRUT</div>`;
-                    sectionEl.appendChild(overlay);
-                }
-            }
-            return;
-        } else {
-            if (sectionEl) {
-                sectionEl.classList.remove('bankrupt-ui');
-                let overlay = sectionEl.querySelector('.bankrupt-overlay-banner');
-                if (overlay) overlay.remove();
-            }
+        if (sectionEl) {
+            sectionEl.classList.remove('bankrupt-ui');
+            let overlay = sectionEl.querySelector('.bankrupt-overlay-banner');
+            if (overlay) overlay.remove();
         }
 
-        // Calculate Player Net Worth
-        let netWorth = player.money;
-        player.properties.forEach(prop => {
-            let tileIndex = BOARD.findIndex(t => t.nama === prop.nama);
-            let tile = BOARD[tileIndex];
-            let propVal = tile.harga;
-            if (tile.mortgaged) {
-                propVal = tile.harga / 2;
-            } else {
-                if (tile.houses && tile.houses > 0) {
-                    if (tile.houses === 5) {
-                        propVal += 250; // hotel investment value
-                    } else {
-                        propVal += tile.houses * 50; // houses investment value
-                    }
-                }
-            }
-            netWorth += propVal;
-        });
-
-        // Update net worth badge dynamically
+        // Hide net worth badge if it exists
         let nwEl = document.getElementById(`networth-p${player.id}`);
-        if (!nwEl) {
-            nwEl = document.createElement('div');
-            nwEl.id = `networth-p${player.id}`;
-            nwEl.className = 'player-networth-badge';
-            const starInd = document.getElementById(`stars-p${player.id}`);
-            if (starInd) {
-                starInd.parentNode.insertBefore(nwEl, starInd);
-            }
-        }
-        nwEl.innerHTML = `<i class="fa-solid fa-chart-line"></i> Aset: <span class="player-networth-val">${formatRp(netWorth)}</span>`;
+        if (nwEl) nwEl.style.display = 'none';
 
-        // Update money
+        // Hide money element if it exists
         let mEl = document.getElementById(`money-p${player.id}`);
-        mEl.innerText = formatRp(player.money);
-        mEl.className = player.money < 0 ? 'player-money text-danger' : 'player-money text-success';
+        if (mEl) mEl.style.display = 'none';
 
         // Update star indicator
         updateStarIndicator(player.id);
@@ -301,163 +286,126 @@ function updateUI() {
             activeBadge.classList.toggle('d-none', player.id !== currentTurn);
         }
 
-        // ===== REDESIGNED INVENTORY / CERTIFICATE WITH GROUPING =====
-        const invDiv = document.getElementById(`inv-p${player.id}`);
-        invDiv.innerHTML = '';
-
-        // Group properties
-        let groups = {};
-        player.properties.forEach(prop => {
-            let tileIndex = BOARD.findIndex(t => t.nama === prop.nama);
-            let tile = BOARD[tileIndex];
-            let grpName = tile.grup || tile.tipe;
-            if (!groups[grpName]) {
-                groups[grpName] = [];
-            }
-            groups[grpName].push({ tileIndex, tile, prop });
-        });
-
-        // Render grouped properties
-        Object.keys(groups).forEach(grpKey => {
-            const grpProps = groups[grpKey];
-            let groupTitle = grpKey;
-            let headerColor = grpKey;
-            
-            if (grpKey === 'bandara') {
-                groupTitle = 'Stasiun & Bandara';
-                headerColor = '#64748b';
-            } else if (grpKey === 'utilitas') {
-                groupTitle = 'Utilitas Publik';
-                headerColor = '#8b5cf6';
-            } else {
-                if (grpKey.startsWith('#')) {
-                    groupTitle = getGroupNameByColor(grpKey);
-                }
-            }
-
-            let groupHtml = `<div class="inventory-group">
-                <div class="inventory-group-title" style="color: ${headerColor}; border-bottom-color: rgba(${hexToRgb(headerColor)}, 0.15)">${groupTitle}</div>`;
-            
-            grpProps.forEach(({ tileIndex, tile, prop }) => {
-                let statusText = '';
-                let statusIcon = '';
-                let statusClass = 'cert-status-empty';
-
-                if (tile.mortgaged) {
-                    statusText = 'Digadaikan';
-                    statusIcon = '<i class="fa-solid fa-lock text-secondary"></i>';
-                    statusClass = 'cert-status-mortgaged';
-                } else if (!tile.houses || tile.houses === 0) {
-                    statusText = 'Tanah';
-                    statusIcon = '<i class="fa-solid fa-seedling"></i>';
-                    statusClass = 'cert-status-empty';
-                } else if (tile.houses < 5) {
-                    statusText = `${tile.houses} Rumah`;
-                    statusIcon = '<i class="fa-solid fa-house"></i>'.repeat(tile.houses);
-                    statusClass = 'cert-status-house';
-                } else {
-                    statusText = 'Hotel';
-                    statusIcon = '<i class="fa-solid fa-building"></i>';
-                    statusClass = 'cert-status-hotel';
-                }
-
-                groupHtml += `
-                    <div class="cert-card">
-                        <div class="cert-card-header" style="background-color: ${headerColor}"></div>
-                        <div class="cert-card-content">
-                            <div class="cert-top-row">
-                                <div class="cert-name">${prop.nama}</div>
-                                <button class="cert-inspect-btn" onclick="handleTileClick(${tileIndex})" title="Inspeksi Properti">
-                                    <i class="fa-solid fa-eye"></i>
-                                </button>
-                            </div>
-                            <div class="cert-status ${statusClass}">
-                                <span class="cert-status-text">${statusText}</span>
-                                <span class="cert-status-icon">${statusIcon}</span>
-                            </div>
-                        </div>
-                    </div>`;
-            });
-
-            groupHtml += `</div>`;
-            invDiv.innerHTML += groupHtml;
-        });
+        // ===== COMPACT PLAYER STATS PANEL =====
+        const netEl = document.getElementById(`net-p${player.id}`);
+        if (netEl) {
+            let netScore = (player.blueStars || 0) - (player.stars || 0);
+            netEl.textContent = (netScore > 0 ? '+' : '') + netScore;
+            netEl.style.color = netScore > 0 ? '#34d399' : (netScore < 0 ? '#ef4444' : '#94a3b8');
+        }
     });
 
-    // Board Indicators
+    // Reset board highlights & houses
     BOARD.forEach((t, idx) => {
         let st = document.getElementById(`houses-${idx}`);
         let tileEl = document.getElementById(`tile-${idx}`);
 
         if (tileEl) tileEl.classList.remove('border-player-0', 'border-player-1', 'border-player-2', 'border-player-3');
-
-        if (!st) return;
-        if (t.owner === undefined) { st.innerHTML = ''; return; }
-
-        if (tileEl) tileEl.classList.add(`border-player-${t.owner}`);
-
-        if (t.mortgaged) st.innerHTML = '<i class="fa-solid fa-lock text-secondary"></i>';
-        else {
-            st.innerHTML = '';
-            if (t.houses > 0 && t.houses < 5) {
-                for (let i = 0; i < t.houses; i++) st.innerHTML += `<i class="fa-solid fa-house ${pColors[t.owner]}"></i>`;
-            } else if (t.houses === 5) {
-                st.innerHTML = `<i class="fa-solid fa-building ${pColors[t.owner]} fs-6"></i>`;
-            }
-        }
+        if (st) st.innerHTML = '';
     });
 
     // Action Buttons
-    if (isActionPhase && !p.isBankrupt) {
+    if (isActionPhase) {
         let btnRoll = document.getElementById('btn-roll');
         let btnEnd = document.getElementById('btn-end');
         let btnBank = document.getElementById('btn-bankrupt');
+
+        if (btnBank) btnBank.classList.add('d-none');
 
         if (!hasRolled) {
             btnRoll.classList.remove('d-none');
             btnRoll.disabled = false;
             btnEnd.classList.add('d-none');
-            btnBank.classList.add('d-none');
         } else {
             btnRoll.classList.add('d-none');
             if (canEndTurn) {
-                if (p.money < 0) {
-                    let totalAssets = calculateAssets(p.id);
-                    if (p.money + totalAssets < 0) {
-                        btnEnd.classList.add('d-none');
-                        btnBank.classList.remove('d-none');
-                    } else {
-                        btnEnd.disabled = true;
-                        btnEnd.innerText = '⚠️ LUNASI HUTANG!';
-                        btnEnd.classList.remove('d-none');
-                        btnBank.classList.add('d-none');
-                    }
-                } else {
-                    btnEnd.disabled = false;
-                    btnEnd.innerText = '✅ AKHIRI GILIRAN';
-                    btnEnd.classList.remove('d-none');
-                    btnBank.classList.add('d-none');
-                }
+                btnEnd.disabled = false;
+                btnEnd.innerText = '✅ AKHIRI GILIRAN';
+                btnEnd.classList.remove('d-none');
             } else {
-                // Movement or kuis is still in progress
                 btnEnd.disabled = true;
                 btnEnd.innerText = '⏳ PROSES GILIRAN...';
                 btnEnd.classList.remove('d-none');
-                btnBank.classList.add('d-none');
             }
         }
     }
 }
 
-function calculateAssets(id) {
-    let val = 0;
-    players[id].properties.forEach(prop => {
-        let t = BOARD.find(x => x.nama === prop.nama);
-        if (!t.mortgaged) val += t.harga / 2;
-        if (t.houses > 0 && t.houses < 5) val += t.houses * 25;
-        if (t.houses === 5) val += 125;
+function endGame() {
+    clearInterval(gameTimerInterval);
+    if (typeof clearAutoRoll === 'function') clearAutoRoll();
+    if (typeof clearActionTimer === 'function') clearActionTimer();
+
+    playSfx(sfx.bell);
+
+    let ranked = players.map(p => {
+        let netScore = (p.blueStars || 0) - (p.stars || 0);
+        return {
+            id: p.id,
+            name: `Player ${p.id + 1}`,
+            blue: p.blueStars || 0,
+            red: p.stars || 0,
+            net: netScore
+        };
     });
-    return val;
+
+    ranked.sort((a, b) => {
+        if (b.net !== a.net) return b.net - a.net;
+        return b.blue - a.blue;
+    });
+
+    let maxNet = ranked[0].net;
+    let winners = ranked.filter(r => r.net === maxNet);
+    let winnerText = winners.length > 1
+        ? `Pemenang Bersama: ${winners.map(w => w.name).join(' & ')} 🎉`
+        : `Pemenang: ${winners[0].name} 🎉`;
+
+    let tableHtml = `
+        <div style="font-family:'Poppins',sans-serif; text-align:center;">
+            <div style="font-size:1.6rem; color:#f59e0b; font-weight:800; margin-bottom:15px; text-shadow:0 0 10px rgba(245,158,11,0.3);">${winnerText}</div>
+            <table class="table table-dark table-striped table-bordered" style="font-size:0.85rem; border-color:#334155; margin-bottom:10px; color:#f8fafc;">
+                <thead>
+                    <tr style="background-color:#1e293b; color:#94a3b8;">
+                        <th>Peringkat</th>
+                        <th>Player</th>
+                        <th style="color:#3b82f6;"><i class="fa-solid fa-star"></i> Biru</th>
+                        <th style="color:#ef4444;"><i class="fa-solid fa-star"></i> Merah</th>
+                        <th style="color:#10b981;">Skor Akhir</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${ranked.map((r, index) => {
+                        let rankStr = ['🥇 1st', '🥈 2nd', '🥉 3rd', '4th'][index];
+                        let isWinner = winners.some(w => w.id === r.id);
+                        let highlightStyle = isWinner ? 'font-weight:800; color:#fbbf24; background-color:rgba(245,158,11,0.1);' : '';
+                        return `
+                            <tr style="${highlightStyle}">
+                                <td>${rankStr}</td>
+                                <td><b>${r.name}</b></td>
+                                <td style="color:#60a5fa;">${r.blue}</td>
+                                <td style="color:#f87171;">${r.red}</td>
+                                <td style="color:#34d399; font-weight:bold;">${r.net}</td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+            <div style="font-size:0.75rem; color:#94a3b8; margin-top:10px;">Skor Akhir = Bintang Biru - Bintang Merah</div>
+        </div>
+    `;
+
+    Swal.fire({
+        title: '⏱️ PERMAINAN SELESAI',
+        html: tableHtml,
+        background: '#0f172a',
+        color: '#f8fafc',
+        allowOutsideClick: false,
+        confirmButtonText: '🔄 Main Lagi',
+        confirmButtonColor: '#10b981',
+        customClass: { popup: 'swal-card-stats' }
+    }).then(() => {
+        window.location.reload();
+    });
 }
 
 function updatePawnPositions(isIntro = false) {

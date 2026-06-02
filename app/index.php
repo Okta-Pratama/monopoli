@@ -32,6 +32,7 @@ session_start();
 <script>
     const BOARD = <?= json_encode($board) ?>;
     const QUESTIONS = <?= json_encode($questions) ?>;
+    const ACTION_COUNTDOWN = <?= $actionCountdown ?>;
 </script>
 <!-- ===== INTRO / SPLASH SCREEN ===== -->
 <div id="intro-screen" class="intro-screen">
@@ -92,42 +93,40 @@ session_start();
                 <h5><i class="fa-solid fa-scroll text-primary me-2"></i>Aturan Dasar</h5>
                 <ol class="ps-3 mb-0" style="line-height: 1.6;">
                     <li class="mb-2">Lempar dadu dan maju sesuai angka.</li>
-                    <li class="mb-2">Jika berhenti di petak materi, jawab soal yang diberikan.</li>
-                    <li class="mb-2">Jawaban benar mendapat <strong class="text-primary">bintang biru <i class="fa-solid fa-star text-primary"></i></strong>.</li>
-                    <li class="mb-2">Jawaban salah mendapat <strong class="text-danger">bintang merah <i class="fa-solid fa-star text-danger"></i></strong>.</li>
-                    <li class="mb-2">Jika berhenti di petak khusus, ambil kartu keberuntungan atau peristiwa.</li>
-                    <li class="mb-2">Pemenang adalah pemain dengan <strong class="text-primary">bintang biru terbanyak</strong> setelah dikurangi <strong class="text-danger">bintang merah</strong>.</li>
+                    <li class="mb-2">Jika berhenti di petak kuis, jawab soal yang diberikan.</li>
+                    <li class="mb-2">Jawaban benar mendapat <strong class="text-primary">1 Bintang Biru <i class="fa-solid fa-star text-primary"></i></strong>.</li>
+                    <li class="mb-2">Jawaban salah mendapat <strong class="text-danger">1 Bintang Merah <i class="fa-solid fa-star text-danger"></i></strong>.</li>
+                    <li class="mb-2">Permainan dibatasi durasi maksimal 15 menit.</li>
+                    <li class="mb-2">Pemenang ditentukan berdasarkan skor tertinggi: <strong class="text-primary">Bintang Biru</strong> dikurangi <strong class="text-danger">Bintang Merah</strong>.</li>
                 </ol>
             </div>
             <!-- Tab 1 content -->
             <div id="rules-tab-content-1" class="rules-tab-content d-none">
                 <h5><i class="fa-solid fa-star text-warning me-2"></i>Kuis dan Bintang ⭐</h5>
-                <p>Jika pemain berhenti pada petak bergambar bintang, pemain wajib menjawab soal sesuai tingkat kesulitan petak.</p>
+                <p>Setiap petak kuis berisikan kode soal dan tingkat kesulitan (ditunjukkan dengan jumlah bintang pada petak).</p>
                 <div class="mb-3">
-                    <strong class="text-success"><i class="fa-solid fa-circle-check me-1"></i> Jika jawaban benar:</strong>
-                    <p class="mb-1 ms-3">Pemain memperoleh bintang biru sesuai jumlah bintang pada petak:</p>
-                    <ul class="ms-3 list-unstyled">
-                        <li>⭐ (Mudah) &rarr; mendapat <strong>1 bintang biru</strong></li>
-                        <li>⭐⭐ (Sedang) &rarr; mendapat <strong>2 bintang biru</strong></li>
-                        <li>⭐⭐⭐ (Sulit) &rarr; mendapat <strong>3 bintang biru</strong></li>
-                        <li>⭐⭐⭐⭐ (Sangat Sulit) &rarr; mendapat <strong>4 bintang biru</strong></li>
-                    </ul>
+                    <strong class="text-success"><i class="fa-solid fa-circle-check me-1"></i> Jawaban Benar:</strong>
+                    <p class="mb-1 ms-3">Pemain memperoleh <strong>1 Bintang Biru</strong>.</p>
                 </div>
                 <div>
-                    <strong class="text-danger"><i class="fa-solid fa-circle-xmark me-1"></i> Jika jawaban salah:</strong>
-                    <p class="mb-0 ms-3">Pemain memperoleh <strong>1 bintang merah</strong>.</p>
+                    <strong class="text-danger"><i class="fa-solid fa-circle-xmark me-1"></i> Jawaban Salah:</strong>
+                    <p class="mb-0 ms-3">Pemain memperoleh <strong>1 Bintang Merah</strong>. Tidak ada denda uang atau eliminasi.</p>
                 </div>
             </div>
             <!-- Tab 2 content -->
             <div id="rules-tab-content-2" class="rules-tab-content d-none">
                 <h5><i class="fa-solid fa-layer-group text-info me-2"></i>Petak Khusus</h5>
-                <div class="mb-3">
-                    <h6 class="fw-bold text-danger mb-1"><i class="fa-solid fa-wind me-1"></i> Kartu Peristiwa Alam 🌪️</h6>
-                    <p class="mb-0">Kartu yang berisi instruksi atau tantangan yang dapat merugikan pemain, seperti mundur langkah, kehilangan giliran, atau mendapat bintang merah.</p>
+                <div class="mb-2">
+                    <h6 class="fw-bold text-success mb-1">🌸 Taman Bunga (Petak 10)</h6>
+                    <p class="mb-2 ms-2">Bebas kuis! Pemain langsung membuka satu Kartu Taman Bunga yang berisi efek menguntungkan.</p>
+                </div>
+                <div class="mb-2">
+                    <h6 class="fw-bold text-danger mb-1">🌪️ Bencana Alam (Petak 30)</h6>
+                    <p class="mb-2 ms-2">Bebas kuis! Pemain langsung membuka satu Kartu Bencana Alam yang berisi efek merugikan.</p>
                 </div>
                 <div>
-                    <h6 class="fw-bold text-success mb-1"><i class="fa-solid fa-leaf me-1"></i> Kartu Taman Bunga 🌸</h6>
-                    <p class="mb-0">Kartu yang berisi instruksi atau hadiah yang menguntungkan pemain, seperti maju langkah, mendapat bintang biru, atau bermain lagi.</p>
+                    <h6 class="fw-bold text-warning mb-1">🗺️ Kesempatan (Petak 20)</h6>
+                    <p class="mb-0 ms-2">Pemain berhak berteleportasi bebas ke petak soal mana pun dan wajib menjawab soal di petak tujuan tersebut.</p>
                 </div>
             </div>
         </div>
@@ -147,44 +146,7 @@ session_start();
 <div class="app-container">
     <div class="game-wrapper">
 
-    <!-- ===== LEFT PANEL: Player 1 & 2 ===== -->
-    <div class="side-panel left-panel">
-        <div class="players-container">
-            <?php for($i=0; $i<2; $i++): ?>
-            <div id="ui-p<?= $i ?>" class="player-section p-indicator-<?= $i ?>">
-                <div class="player-watermark">
-                    <i class="fa-solid <?= ['fa-chess-pawn', 'fa-chess-knight', 'fa-chess-rook', 'fa-chess-queen'][$i] ?>"></i>
-                </div>
-                <div class="player-header">
-                    <div class="player-icon bg-player-<?= $i ?>">
-                        <i class="fa-solid <?= ['fa-chess-pawn', 'fa-chess-knight', 'fa-chess-rook', 'fa-chess-queen'][$i] ?>"></i>
-                    </div>
-                    <div class="player-info">
-                        <div class="player-name-row">
-                            <span class="player-name">Player <?= $i+1 ?></span>
-                            <span id="active-badge-<?= $i ?>" class="active-turn-badge d-none">GILIRAN!</span>
-                            <span id="jail-badge-<?= $i ?>" class="jail-badge d-none"><i class="fa-solid fa-bars-staggered"></i> JAIL</span>
-                        </div>
-                        <div class="player-money" id="money-p<?= $i ?>">Rp 1.500.000</div>
-                        <div class="stars-row" style="display: flex; gap: 8px; align-items: center; margin-top: 2px;">
-                            <div class="star-indicator" id="stars-p<?= $i ?>" title="Bintang Merah (Peringatan)">
-                                <span class="star-empty">☆</span>
-                                <span class="star-empty">☆</span>
-                                <span class="star-empty">☆</span>
-                            </div>
-                            <div class="blue-stars-container" id="blue-stars-p<?= $i ?>" title="Bintang Biru (Bonus)">
-                                <span class="blue-stars-val" style="color: #3b82f6; font-weight: bold; font-size: 0.9rem;">
-                                    <i class="fa-solid fa-star"></i> 0
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="inventory-flat" id="inv-p<?= $i ?>"></div>
-            </div>
-            <?php endfor; ?>
-        </div>
-    </div>
+
 
     <!-- ===== MONOPOLY BOARD ===== -->
     <div class="monopoly-board" id="board">
@@ -277,70 +239,41 @@ session_start();
 
 
         foreach ($board as $index => $petak): 
-            $iconClass = 'fa-star';
-            if ($petak['tipe'] === 'properti') $iconClass = 'fa-building';
-            else if ($petak['tipe'] === 'dana_umum') $iconClass = 'fa-gift';
-            else if ($petak['tipe'] === 'kesempatan') $iconClass = 'fa-question';
-            else if ($petak['tipe'] === 'pajak') $iconClass = 'fa-money-bill-wave';
-            else if ($petak['tipe'] === 'bandara') $iconClass = 'fa-plane';
-            else if ($petak['tipe'] === 'utilitas') $iconClass = 'fa-lightbulb';
-            
-            // Determine which side of the board the tile is on
+            // Determine side
             if ($index >= 1 && $index <= 9) $side = 'bottom';
             else if ($index >= 11 && $index <= 19) $side = 'left';
             else if ($index >= 21 && $index <= 29) $side = 'top';
             else if ($index >= 31 && $index <= 39) $side = 'right';
             else $side = 'corner';
             
-            // Determine color bar color for non-property tiles
-            $barColor = '';
-            if (isset($petak['grup'])) {
-                $barColor = $petak['grup'];
-            } else {
-                switch($petak['tipe']) {
-                    case 'dana_umum': $barColor = '#3b82f6'; break;
-                    case 'kesempatan': $barColor = '#f59e0b'; break;
-                    case 'pajak': $barColor = '#ef4444'; break;
-                    case 'bandara': $barColor = '#64748b'; break;
-                    case 'utilitas': $barColor = '#8b5cf6'; break;
-                }
-            }
+            $barColor = isset($petak['grup']) ? $petak['grup'] : '#e8e8eb';
             
-            $emoji = $tileEmojis[$index] ?? '🏠';
+            // Set emoji/icon for special corner tiles
+            $emoji = '';
+            if ($index === 0) $emoji = '🚀';
+            else if ($index === 10) $emoji = '🌸';
+            else if ($index === 20) $emoji = '🗺️';
+            else if ($index === 30) $emoji = '🌪️';
         ?>
-            <div class="tile tile-<?= $index ?> <?= $petak['tipe'] ?> side-<?= $side ?>" id="tile-<?= $index ?>" data-side="<?= $side ?>" onclick="handleTileClick(<?= $index ?>)" style="--tile-color: <?= $barColor ?: '#94a3b8' ?>;">
-                <i class="fa-solid <?= $iconClass ?> fallback-icon"></i>
+            <div class="tile tile-<?= $index ?> <?= $petak['tipe'] ?> side-<?= $side ?>" id="tile-<?= $index ?>" data-side="<?= $side ?>" onclick="handleTileClick(<?= $index ?>)" style="--tile-color: <?= $barColor ?>;">
                 <div class="tile-overlay"></div>
-                <?php if ($side !== 'corner'): ?>
-                    <div class="tile-emoji">
-                        <?php if (strpos($emoji, 'fa-') !== false): ?>
-                            <i class="<?= $emoji ?>"></i>
-                        <?php else: ?>
-                            <?= $emoji ?>
-                        <?php endif; ?>
-                    </div>
-                <?php endif; ?>
-                <div class="house-indicator" id="houses-<?= $index ?>"></div>
-                <?php if($barColor): ?>
+                <?php if ($side === 'corner'): ?>
+                    <div class="tile-emoji" style="font-size:2.2rem; margin-bottom: 4px;"><?= $emoji ?></div>
+                    <div class="tile-name" style="font-weight:900; font-size:0.65rem; color:#1e293b; text-transform:uppercase;"><?= $petak['nama'] ?></div>
+                <?php else: ?>
                     <div class="tile-color-bar" style="background-color: <?= $barColor ?>"></div>
-                <?php endif; ?>
-                <?php if ($side !== 'corner'): ?>
-                    <div class="tile-name">
-                        <?= $petak['nama'] ?>
-                    </div>
-                <?php endif; ?>
-                <?php if($petak['harga'] > 0): ?>
-                    <div class="tile-price"><?= formatRp($petak['harga']) ?></div>
-                <?php endif; ?>
-                <?php if (isset($tileQuizConfig[$index])): ?>
-                    <div class="tile-star-icon">
-                        <?php for ($s = 0; $s < $tileQuizConfig[$index]['level']; $s++): ?>
-                            <i class="fa-solid fa-star"></i>
-                        <?php endfor; ?>
-                    </div>
-                    <div class="tile-code">
-                        <?= $tileQuizConfig[$index]['cat'] . $tileQuizConfig[$index]['level'] ?>
-                    </div>
+                    <?php if (isset($tileQuizConfig[$index])): ?>
+                        <div class="tile-quiz-container">
+                            <div class="tile-quiz-code">
+                                <?= $tileQuizConfig[$index]['cat'] . $tileQuizConfig[$index]['level'] ?>
+                            </div>
+                            <div class="tile-quiz-stars">
+                                <?php for ($s = 0; $s < $tileQuizConfig[$index]['level']; $s++): ?>
+                                    <i class="fa-solid fa-star"></i>
+                                <?php endfor; ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 <?php endif; ?>
             </div>
         <?php endforeach; ?>
@@ -372,13 +305,22 @@ session_start();
 
             <!-- Control Center -->
             <div class="cb-control-center">
-                <!-- Stock Rumah -->
-                <div class="cb-stock cb-stock-house">
-                    <div class="cb-stock-ring">
-                        <i class="fa-solid fa-house"></i>
+                <!-- Left Players: Player 1 & 2 -->
+                <div class="cb-players-group cb-players-left">
+                    <?php for($i=0; $i<2; $i++): ?>
+                    <div id="ui-p<?= $i ?>" class="cb-player-box p-indicator-<?= $i ?>">
+                        <div class="cb-player-header">
+                            <span class="cb-player-dot bg-player-<?= $i ?>"></span>
+                            <span class="cb-player-name">Player <?= $i+1 ?></span>
+                            <span id="active-badge-<?= $i ?>" class="active-turn-badge d-none">GILIRAN</span>
+                        </div>
+                        <div class="cb-player-stats">
+                            <span id="blue-stars-p<?= $i ?>" title="Bintang Biru"></span>
+                            <span id="stars-p<?= $i ?>" title="Bintang Merah"></span>
+                            <span id="net-p<?= $i ?>" class="cb-net-score" title="Skor Bersih">0</span>
+                        </div>
                     </div>
-                    <span class="cb-stock-num" id="stock-rumah">32</span>
-                    <span class="cb-stock-label">Rumah</span>
+                    <?php endfor; ?>
                 </div>
 
                 <!-- Dice & Turn Area -->
@@ -399,13 +341,22 @@ session_start();
                     </div>
                 </div>
 
-                <!-- Stock Hotel -->
-                <div class="cb-stock cb-stock-hotel">
-                    <div class="cb-stock-ring">
-                        <i class="fa-solid fa-building"></i>
+                <!-- Right Players: Player 3 & 4 -->
+                <div class="cb-players-group cb-players-right">
+                    <?php for($i=2; $i<4; $i++): ?>
+                    <div id="ui-p<?= $i ?>" class="cb-player-box p-indicator-<?= $i ?>">
+                        <div class="cb-player-header">
+                            <span class="cb-player-dot bg-player-<?= $i ?>"></span>
+                            <span class="cb-player-name">Player <?= $i+1 ?></span>
+                            <span id="active-badge-<?= $i ?>" class="active-turn-badge d-none">GILIRAN</span>
+                        </div>
+                        <div class="cb-player-stats">
+                            <span id="blue-stars-p<?= $i ?>" title="Bintang Biru"></span>
+                            <span id="stars-p<?= $i ?>" title="Bintang Merah"></span>
+                            <span id="net-p<?= $i ?>" class="cb-net-score" title="Skor Bersih">0</span>
+                        </div>
                     </div>
-                    <span class="cb-stock-num" id="stock-hotel">12</span>
-                    <span class="cb-stock-label">Hotel</span>
+                    <?php endfor; ?>
                 </div>
             </div>
 
@@ -423,8 +374,8 @@ session_start();
                     <button class="cb-dashboard-btn" onclick="showHelpModal()" title="Bantuan & Aturan Main">
                         <i class="fa-solid fa-book-open"></i> Aturan
                     </button>
-                    <button class="cb-dashboard-btn" onclick="Swal.fire({title:'💰 Informasi Bank', html:'<div style=\'font-size:0.95rem; color:#f1f5f9; text-align:left; line-height: 1.6;\'><ul style=\'padding-left:16px; margin:0;\'><li>💰 Modal awal: <b>Rp 1.500.000</b></li><li>🚀 Lewati START: <b>+Rp 200.000</b></li><li>⭐ 3x bintang salah kuis: masuk <b>Penjara</b></li><li>🎲 Dadu 6 di penjara: <b>Bebas!</b></li></ul></div>',icon:'info',confirmButtonText:'Mengerti!',customClass:{popup:'swal-card-stats'}})" title="Informasi Bank & Nilai Awal">
-                        <i class="fa-solid fa-circle-info"></i> Info Bank
+                    <button class="cb-dashboard-btn" onclick="Swal.fire({title:'⭐ Sistem Poin', html:'<div style=\'font-size:0.95rem; color:#f1f5f9; text-align:left; line-height: 1.6;\'><ul style=\'padding-left:16px; margin:0;\'><li>✔️ <b>Jawaban Benar:</b> Mendapatkan 1 Bintang Biru</li><li>❌ <b>Jawaban Salah:</b> Mendapatkan 1 Bintang Merah</li><li>⏱️ <b>Durasi Game:</b> Maksimal 15 Menit</li><li>🏆 <b>Skor Akhir:</b> Bintang Biru - Bintang Merah</li></ul></div>',icon:'info',confirmButtonText:'Mengerti!',customClass:{popup:'swal-card-stats'}})" title="Informasi Sistem Poin">
+                        <i class="fa-solid fa-circle-info"></i> Sistem Poin
                     </button>
                 </div>
             </div>
@@ -438,44 +389,7 @@ session_start();
         <div id="pawn-3" class="pawn-container text-player-3"><i class="fa-solid fa-chess-queen"></i></div>
     </div>
 
-    <!-- ===== RIGHT PANEL: Player 3 & 4 ===== -->
-    <div class="side-panel right-panel">
-        <div class="players-container">
-            <?php for($i=2; $i<4; $i++): ?>
-            <div id="ui-p<?= $i ?>" class="player-section p-indicator-<?= $i ?>">
-                <div class="player-watermark">
-                    <i class="fa-solid <?= ['fa-chess-pawn', 'fa-chess-knight', 'fa-chess-rook', 'fa-chess-queen'][$i] ?>"></i>
-                </div>
-                <div class="player-header">
-                    <div class="player-icon bg-player-<?= $i ?>">
-                        <i class="fa-solid <?= ['fa-chess-pawn', 'fa-chess-knight', 'fa-chess-rook', 'fa-chess-queen'][$i] ?>"></i>
-                    </div>
-                    <div class="player-info">
-                        <div class="player-name-row">
-                            <span class="player-name">Player <?= $i+1 ?></span>
-                            <span id="active-badge-<?= $i ?>" class="active-turn-badge d-none">GILIRAN!</span>
-                            <span id="jail-badge-<?= $i ?>" class="jail-badge d-none"><i class="fa-solid fa-bars-staggered"></i> JAIL</span>
-                        </div>
-                        <div class="player-money" id="money-p<?= $i ?>">Rp 1.500.000</div>
-                        <div class="stars-row" style="display: flex; gap: 8px; align-items: center; margin-top: 2px;">
-                            <div class="star-indicator" id="stars-p<?= $i ?>" title="Bintang Merah (Peringatan)">
-                                <span class="star-empty">☆</span>
-                                <span class="star-empty">☆</span>
-                                <span class="star-empty">☆</span>
-                            </div>
-                            <div class="blue-stars-container" id="blue-stars-p<?= $i ?>" title="Bintang Biru (Bonus)">
-                                <span class="blue-stars-val" style="color: #3b82f6; font-weight: bold; font-size: 0.9rem;">
-                                    <i class="fa-solid fa-star"></i> 0
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="inventory-flat" id="inv-p<?= $i ?>"></div>
-            </div>
-            <?php endfor; ?>
-        </div>
-    </div>
+
 </div>
 </div>
 
@@ -494,31 +408,25 @@ session_start();
                 <h5><i class="fa-solid fa-scroll text-primary me-2"></i>Aturan Dasar</h5>
                 <ol class="ps-3 mb-0" style="line-height: 1.6;">
                     <li class="mb-1">Lempar dadu dan maju sesuai angka.</li>
-                    <li class="mb-1">Jika berhenti di petak materi, jawab soal yang diberikan.</li>
-                    <li class="mb-1">Jawaban benar mendapat <strong class="text-primary">bintang biru <i class="fa-solid fa-star text-primary"></i></strong>.</li>
-                    <li class="mb-1">Jawaban salah mendapat <strong class="text-danger">bintang merah <i class="fa-solid fa-star text-danger"></i></strong>.</li>
-                    <li class="mb-1">Jika berhenti di petak khusus, ambil kartu keberuntungan atau peristiwa.</li>
-                    <li class="mb-1">Pemenang adalah pemain dengan <strong class="text-primary">bintang biru terbanyak</strong> setelah dikurangi <strong class="text-danger">bintang merah</strong>.</li>
+                    <li class="mb-1">Jika berhenti di petak kuis, jawab soal yang diberikan.</li>
+                    <li class="mb-1">Jawaban benar mendapat <strong class="text-primary">1 Bintang Biru <i class="fa-solid fa-star text-primary"></i></strong>.</li>
+                    <li class="mb-1">Jawaban salah mendapat <strong class="text-danger">1 Bintang Merah <i class="fa-solid fa-star text-danger"></i></strong>.</li>
+                    <li class="mb-1">Permainan dibatasi durasi maksimal 15 menit.</li>
+                    <li class="mb-1">Pemenang ditentukan berdasarkan skor tertinggi: <strong class="text-primary">Bintang Biru</strong> dikurangi <strong class="text-danger">Bintang Merah</strong>.</li>
                 </ol>
             </div>
             
             <!-- Kuis & Bintang -->
             <div class="rule-section">
                 <h5><i class="fa-solid fa-star text-warning me-2"></i>Kuis dan Bintang ⭐</h5>
-                <p class="mb-2">Jika pemain berhenti pada petak bergambar bintang, pemain wajib menjawab soal sesuai tingkat kesulitan petak.</p>
+                <p class="mb-2">Setiap petak kuis berisikan kode soal dan tingkat kesulitan (mudah ⭐ hingga sangat sulit ⭐⭐⭐⭐).</p>
                 <div class="mb-2 ms-2">
-                    <strong class="text-success"><i class="fa-solid fa-circle-check me-1"></i> Jika jawaban benar:</strong>
-                    <p class="mb-1 ms-3">Pemain memperoleh bintang biru sesuai jumlah bintang pada petak:</p>
-                    <ul class="ms-3 list-unstyled">
-                        <li>⭐ (Mudah) &rarr; mendapat <strong>1 bintang biru</strong></li>
-                        <li>⭐⭐ (Sedang) &rarr; mendapat <strong>2 bintang biru</strong></li>
-                        <li>⭐⭐⭐ (Sulit) &rarr; mendapat <strong>3 bintang biru</strong></li>
-                        <li>⭐⭐⭐⭐ (Sangat Sulit) &rarr; mendapat <strong>4 bintang biru</strong></li>
-                    </ul>
+                    <strong class="text-success"><i class="fa-solid fa-circle-check me-1"></i> Jawaban Benar:</strong>
+                    <p class="mb-1 ms-3">Pemain memperoleh <strong>1 Bintang Biru</strong>.</p>
                 </div>
                 <div class="ms-2">
-                    <strong class="text-danger"><i class="fa-solid fa-circle-xmark me-1"></i> Jika jawaban salah:</strong>
-                    <p class="mb-0 ms-3">Pemain memperoleh <strong>1 bintang merah</strong>.</p>
+                    <strong class="text-danger"><i class="fa-solid fa-circle-xmark me-1"></i> Jawaban Salah:</strong>
+                    <p class="mb-0 ms-3">Pemain memperoleh <strong>1 Bintang Merah</strong>. Tidak ada denda uang atau hukuman diskualifikasi.</p>
                 </div>
             </div>
 
@@ -526,23 +434,17 @@ session_start();
             <div class="rule-section">
                 <h5><i class="fa-solid fa-layer-group text-info me-2"></i>Petak Khusus</h5>
                 <div class="mb-2">
-                    <h6 class="fw-bold text-danger mb-1"><i class="fa-solid fa-wind me-1"></i> Kartu Peristiwa Alam 🌪️</h6>
-                    <p class="mb-0 ms-2">Kartu yang berisi instruksi atau tantangan yang dapat merugikan pemain, seperti mundur langkah, kehilangan giliran, atau mendapat bintang merah.</p>
+                    <h6 class="fw-bold text-success mb-1">🌸 Taman Bunga (Petak 10)</h6>
+                    <p class="mb-1 ms-2">Bebas kuis! Pemain langsung membuka satu Kartu Taman Bunga dengan efek menguntungkan.</p>
+                </div>
+                <div class="mb-2">
+                    <h6 class="fw-bold text-danger mb-1">🌪️ Bencana Alam (Petak 30)</h6>
+                    <p class="mb-1 ms-2">Bebas kuis! Pemain langsung membuka satu Kartu Bencana Alam dengan efek merugikan.</p>
                 </div>
                 <div>
-                    <h6 class="fw-bold text-success mb-1"><i class="fa-solid fa-leaf me-1"></i> Kartu Taman Bunga 🌸</h6>
-                    <p class="mb-0 ms-2">Kartu yang berisi instruksi atau hadiah yang menguntungkan pemain, seperti maju langkah, mendapat bintang biru, atau bermain lagi.</p>
+                    <h6 class="fw-bold text-warning mb-1">🗺️ Kesempatan (Petak 20)</h6>
+                    <p class="mb-0 ms-2">Pemain berhak berteleportasi bebas ke petak soal mana pun dan wajib menjawab soal di petak tujuan tersebut.</p>
                 </div>
-            </div>
-
-            <!-- Monopoli & Keuangan Tambahan -->
-            <div class="rule-section">
-                <h5><i class="fa-solid fa-coins text-warning me-2"></i>Informasi Properti & Keuangan</h5>
-                <ul class="ps-3 mb-0" style="line-height: 1.6;">
-                    <li><strong>Modal Awal:</strong> Setiap pemain memulai dengan modal kas sebesar <strong>Rp 1.500.000</strong>.</li>
-                    <li><strong>Pembangunan:</strong> Anda dapat membangun rumah/hotel jika memiliki seluruh properti dalam satu kelompok warna (Monopoli).</li>
-                    <li><strong>Utang & Gadaian:</strong> Jika kas mencapai nilai negatif, Anda wajib melunasi utang dengan menggadaikan atau menjual aset sebelum mengakhiri giliran.</li>
-                </ul>
             </div>
         </div>
         <div class="custom-modal-footer">
@@ -554,7 +456,6 @@ session_start();
 <script src="../src/script/state.js?v=<?= time() ?>"></script>
 <script src="../src/script/ui.js?v=<?= time() ?>"></script>
 <script src="../src/script/cards.js?v=<?= time() ?>"></script>
-<script src="../src/script/property.js?v=<?= time() ?>"></script>
 <script src="../src/script/turn.js?v=<?= time() ?>"></script>
 <script src="../src/script/main.js?v=<?= time() ?>"></script>
 
