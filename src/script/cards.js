@@ -568,6 +568,8 @@ function drawCard(type, p, onComplete) {
 
                     <!-- Judul Spesifik Kartu -->
                     <div style="
+                        position: relative;
+                        z-index: 2;
                         font-size: 1.9rem;
                         font-weight: 900;
                         color: #ffffff;
@@ -577,37 +579,40 @@ function drawCard(type, p, onComplete) {
                         text-align: center;
                         margin-top: 5px;
                     ">${cardDetails.name}</div>
-
-                    <!-- Lingkaran Ikon Kustom Premium -->
+ 
+                    <!-- Ikon Kustom Absolute (90% width, centered vertically & horizontally) -->
                     <div style="
-                        width: 105px;
-                        height: 105px;
-                        border-radius: 50%;
-                        background: rgba(15, 23, 42, 0.5);
-                        border: 2.5px solid ${cardDetails.color}bb;
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        width: 90%;
+                        height: 180px;
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        box-shadow: 0 0 20px ${cardDetails.color}50, inset 0 0 15px rgba(0, 0, 0, 0.7);
-                        backdrop-filter: blur(4px);
+                        z-index: 1;
+                        pointer-events: none;
                     ">
                         ${cardDetails.customIcon === 'redstar2' ? `
-                            <div style="display: flex; gap: 6px; justify-content: center; align-items: center;">
-                                <img src="../public/images/card/icon-card/redstar1.png" style="width: 42px; height: 42px; object-fit: contain;">
-                                <img src="../public/images/card/icon-card/redstar1.png" style="width: 42px; height: 42px; object-fit: contain;">
+                            <div style="display: flex; gap: 15px; justify-content: center; align-items: center;">
+                                <img src="../public/images/card/icon-card/redstar1.png" style="height: 140px; width: auto; object-fit: contain;">
+                                <img src="../public/images/card/icon-card/redstar1.png" style="height: 140px; width: auto; object-fit: contain;">
                             </div>
                         ` : `
                             <img src="../public/images/card/icon-card/${cardDetails.customIcon}" style="
-                                width: 68px;
-                                height: 68px;
+                                height: 180px;
+                                width: auto;
+                                max-width: 90%;
                                 object-fit: contain;
-                                filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.25));
                             ">
                         `}
                     </div>
-
+ 
                     <!-- Teks Deskripsi Kartu di Bagian Bawah -->
                     <div style="
+                        position: relative;
+                        z-index: 2;
                         font-size: 1.35rem;
                         font-weight: 800;
                         color: #ffffff;

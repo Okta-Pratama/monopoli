@@ -25,21 +25,48 @@ session_start();
     const BOARD = <?= json_encode($board) ?>;
     const QUESTIONS = <?= json_encode($questions) ?>;
 </script>
-
 <!-- ===== INTRO / SPLASH SCREEN ===== -->
 <div id="intro-screen" class="intro-screen">
+    <!-- Cinematic Visual Background Accents -->
+    <div class="intro-glow-bg blur-1"></div>
+    <div class="intro-glow-bg blur-2"></div>
+    <div class="intro-glow-bg blur-3"></div>
+    <div class="intro-grid-pattern"></div>
+    
+    <!-- Floating Stats Pillars for Gaming Vibe -->
+    <div class="intro-floating-charts">
+        <div class="chart-bar bar-1"></div>
+        <div class="chart-bar bar-2"></div>
+        <div class="chart-bar bar-3"></div>
+        <div class="chart-bar bar-4"></div>
+        <div class="chart-bar bar-5"></div>
+    </div>
+
     <!-- Phase 1: Splash Welcome Card -->
-    <div id="intro-main-card" class="intro-card animate__animated animate__zoomIn">
-        <div class="intro-logo">📊</div>
-        <h1 class="intro-title">MONIKA</h1>
-        <p class="intro-subtitle">Monopoli Statistika</p>
-        <div class="intro-divider"></div>
-        <div class="intro-creators">
-            <span class="creators-label">Dibuat Oleh:</span>
-            <span class="creators-name">Kelompok 2 Statistika & Probabilitas</span>
+    <div id="intro-main-card" class="intro-card main-splash-card animate__animated animate__zoomIn">
+        <!-- Premium Rotating Tech Logo -->
+        <div class="intro-logo-container">
+            <div class="logo-ring ring-outer"></div>
+            <div class="logo-ring ring-middle"></div>
+            <div class="logo-ring ring-inner"></div>
+            <div class="intro-logo-icon">
+                <i class="fa-solid fa-chart-simple"></i>
+            </div>
         </div>
+        
+        <h1 class="intro-title">MONIKA</h1>
+        <div class="intro-subtitle-capsule">MONOPOLI STATISTIKA</div>
+        
+        <div class="intro-divider-glow"></div>
+        
+        <div class="intro-creators-capsule">
+            <span class="label">DEVELOPMENT TEAM</span>
+            <span class="name">Kelompok 2 media pembelajaran kelas A</span>
+        </div>
+        
         <button id="btn-start-game" class="intro-start-btn" onclick="startGameWithIntro()">
-            🚀 MULAI PERMAINAN
+            <span>🚀 MULAI PERMAINAN</span>
+            <div class="btn-ripple"></div>
         </button>
     </div>
 
@@ -96,7 +123,7 @@ session_start();
                 </div>
             </div>
         </div>
-        <button id="btn-confirm-rules" class="intro-start-btn" onclick="confirmRulesAndStartCountdown()" style="background: linear-gradient(135deg, #10b981, #059669); margin-top: 15px;">
+        <button id="btn-confirm-rules" class="intro-confirm-btn" onclick="confirmRulesAndStartCountdown()">
             🎮 SAYA SIAP BERMAIN!
         </button>
     </div>
