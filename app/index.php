@@ -36,7 +36,7 @@ session_start();
         <div class="intro-divider"></div>
         <div class="intro-creators">
             <span class="creators-label">Dibuat Oleh:</span>
-            <span class="creators-name">Kelompok 3 Statistika & Probabilitas</span>
+            <span class="creators-name">Kelompok 2 Statistika & Probabilitas</span>
         </div>
         <button id="btn-start-game" class="intro-start-btn" onclick="startGameWithIntro()">
             🚀 MULAI PERMAINAN
@@ -49,31 +49,51 @@ session_start();
         <div class="rules-tabs-container">
             <button class="rules-tab-btn active" onclick="switchRulesTab(0)">📘 Aturan Dasar</button>
             <button class="rules-tab-btn" onclick="switchRulesTab(1)">⭐ Kuis & Bintang</button>
-            <button class="rules-tab-btn" onclick="switchRulesTab(2)">🃏 Kartu Keberuntungan</button>
+            <button class="rules-tab-btn" onclick="switchRulesTab(2)">🃏 Petak Khusus</button>
         </div>
         <div class="rules-content-box">
             <!-- Tab 0 content -->
             <div id="rules-tab-content-0" class="rules-tab-content">
-                <h5>💰 Modal Awal & Putaran</h5>
-                <p>Setiap pemain dibekali modal awal sebesar <strong>Rp 3.000.000</strong>. Kelilingi papan monopoli, lewati petak <strong>START</strong> untuk mendapatkan bonus gaji sebesar <strong>Rp 200.000</strong>.</p>
-                <h5>🏢 Monopoli & Bangunan</h5>
-                <p>Kuasai semua daerah dalam satu kelompok warna untuk dapat membangun rumah dan hotel guna melipatgandakan biaya sewa pemain lawan.</p>
+                <h5><i class="fa-solid fa-scroll text-primary me-2"></i>Aturan Dasar</h5>
+                <ol class="ps-3 mb-0" style="line-height: 1.6;">
+                    <li class="mb-2">Lempar dadu dan maju sesuai angka.</li>
+                    <li class="mb-2">Jika berhenti di petak materi, jawab soal yang diberikan.</li>
+                    <li class="mb-2">Jawaban benar mendapat <strong class="text-primary">bintang biru <i class="fa-solid fa-star text-primary"></i></strong>.</li>
+                    <li class="mb-2">Jawaban salah mendapat <strong class="text-danger">bintang merah <i class="fa-solid fa-star text-danger"></i></strong>.</li>
+                    <li class="mb-2">Jika berhenti di petak khusus, ambil kartu keberuntungan atau peristiwa.</li>
+                    <li class="mb-2">Pemenang adalah pemain dengan <strong class="text-primary">bintang biru terbanyak</strong> setelah dikurangi <strong class="text-danger">bintang merah</strong>.</li>
+                </ol>
             </div>
             <!-- Tab 1 content -->
             <div id="rules-tab-content-1" class="rules-tab-content d-none">
-                <h5>📊 Kuis Statistika Wajib</h5>
-                <p>Untuk membeli properti kosong, Anda wajib menjawab pertanyaan <strong>Statistika</strong> sesuai kategori (Mean, Median, Modus, Kuartil, Jangkauan) dan tingkat kesulitan (1-4) pada petak tersebut.</p>
-                <h5>🚨 Peringatan Bintang Merah</h5>
-                <p>Jika jawaban Anda salah, Anda mendapatkan <strong>1 Bintang Merah</strong>. Jika terkumpul <strong>3 Bintang Merah</strong>, Anda akan dikenakan denda otomatis sebesar <strong>Rp 200.000</strong>.</p>
+                <h5><i class="fa-solid fa-star text-warning me-2"></i>Kuis dan Bintang ⭐</h5>
+                <p>Jika pemain berhenti pada petak bergambar bintang, pemain wajib menjawab soal sesuai tingkat kesulitan petak.</p>
+                <div class="mb-3">
+                    <strong class="text-success"><i class="fa-solid fa-circle-check me-1"></i> Jika jawaban benar:</strong>
+                    <p class="mb-1 ms-3">Pemain memperoleh bintang biru sesuai jumlah bintang pada petak:</p>
+                    <ul class="ms-3 list-unstyled">
+                        <li>⭐ (Mudah) &rarr; mendapat <strong>1 bintang biru</strong></li>
+                        <li>⭐⭐ (Sedang) &rarr; mendapat <strong>2 bintang biru</strong></li>
+                        <li>⭐⭐⭐ (Sulit) &rarr; mendapat <strong>3 bintang biru</strong></li>
+                        <li>⭐⭐⭐⭐ (Sangat Sulit) &rarr; mendapat <strong>4 bintang biru</strong></li>
+                    </ul>
+                </div>
+                <div>
+                    <strong class="text-danger"><i class="fa-solid fa-circle-xmark me-1"></i> Jika jawaban salah:</strong>
+                    <p class="mb-0 ms-3">Pemain memperoleh <strong>1 bintang merah</strong>.</p>
+                </div>
             </div>
             <!-- Tab 2 content -->
             <div id="rules-tab-content-2" class="rules-tab-content d-none">
-                <h5>🃏 Kartu Keberuntungan (Petak 10 & 30)</h5>
-                <p>Saat mendarat di petak <strong>Taman Bunga (10)</strong> atau <strong>Peristiwa Alam (30)</strong>, Anda akan memilih 1 dari 3 kartu rahasia. Kategori materi terlihat di belakang kartu, namun level dan efek baik/buruk masih rahasia!</p>
-                <ul>
-                    <li>✅ <strong>BENAR (Kartu Bagus)</strong>: Mendapat reward kuis + bonus Rp 150.000!</li>
-                    <li>❌ <strong>SALAH (Kartu Jelek)</strong>: Denda Rp 100.000 + 1 bintang merah!</li>
-                </ul>
+                <h5><i class="fa-solid fa-layer-group text-info me-2"></i>Petak Khusus</h5>
+                <div class="mb-3">
+                    <h6 class="fw-bold text-danger mb-1"><i class="fa-solid fa-wind me-1"></i> Kartu Peristiwa Alam 🌪️</h6>
+                    <p class="mb-0">Kartu yang berisi instruksi atau tantangan yang dapat merugikan pemain, seperti mundur langkah, kehilangan giliran, atau mendapat bintang merah.</p>
+                </div>
+                <div>
+                    <h6 class="fw-bold text-success mb-1"><i class="fa-solid fa-leaf me-1"></i> Kartu Taman Bunga 🌸</h6>
+                    <p class="mb-0">Kartu yang berisi instruksi atau hadiah yang menguntungkan pemain, seperti maju langkah, mendapat bintang biru, atau bermain lagi.</p>
+                </div>
             </div>
         </div>
         <button id="btn-confirm-rules" class="intro-start-btn" onclick="confirmRulesAndStartCountdown()" style="background: linear-gradient(135deg, #10b981, #059669); margin-top: 15px;">
@@ -400,28 +420,60 @@ session_start();
             <button class="modal-close-btn" onclick="hideHelpModal()">&times;</button>
         </div>
         <div class="custom-modal-body">
+            <!-- Aturan Dasar -->
             <div class="rule-section">
-                <h5><i class="fa-solid fa-coins text-warning me-2"></i>Modal Awal & Uang Kas</h5>
-                <p>Setiap pemain memulai dengan modal kas sebesar <strong>Rp 3.000.000</strong>. Jika kas Anda mencapai nilai negatif, Anda wajib melunasi hutang dengan menggadaikan atau menjual rumah/hotel Anda sebelum giliran berakhir.</p>
+                <h5><i class="fa-solid fa-scroll text-primary me-2"></i>Aturan Dasar</h5>
+                <ol class="ps-3 mb-0" style="line-height: 1.6;">
+                    <li class="mb-1">Lempar dadu dan maju sesuai angka.</li>
+                    <li class="mb-1">Jika berhenti di petak materi, jawab soal yang diberikan.</li>
+                    <li class="mb-1">Jawaban benar mendapat <strong class="text-primary">bintang biru <i class="fa-solid fa-star text-primary"></i></strong>.</li>
+                    <li class="mb-1">Jawaban salah mendapat <strong class="text-danger">bintang merah <i class="fa-solid fa-star text-danger"></i></strong>.</li>
+                    <li class="mb-1">Jika berhenti di petak khusus, ambil kartu keberuntungan atau peristiwa.</li>
+                    <li class="mb-1">Pemenang adalah pemain dengan <strong class="text-primary">bintang biru terbanyak</strong> setelah dikurangi <strong class="text-danger">bintang merah</strong>.</li>
+                </ol>
             </div>
             
+            <!-- Kuis & Bintang -->
             <div class="rule-section">
-                <h5><i class="fa-solid fa-brain text-danger me-2"></i>Pembelian Tanah & Soal Statistika</h5>
-                <p>Untuk membeli tanah kosong yang Anda darati, Anda harus menjawab pertanyaan <strong>Statistika</strong> terlebih dahulu:</p>
-                <ul>
-                    <li><strong>Jawaban Benar:</strong> Anda berhak membeli tanah tersebut dan mendapatkan poin/reward uang tunai tambahan.</li>
-                    <li><strong>Jawaban Salah:</strong> Anda mendapatkan <strong>1 Bintang Peringatan</strong>. Anda tetap boleh membeli tanah tersebut dengan harga normal, namun jika Anda mengumpulkan <strong>3 Bintang</strong>, Anda akan dikenakan denda otomatis sebesar <strong>Rp 200.000</strong>.</li>
-                </ul>
-            </div>
-            
-            <div class="rule-section">
-                <h5><i class="fa-solid fa-hammer text-primary me-2"></i>Pembangunan Rumah & Hotel</h5>
-                <p>Anda dapat membangun rumah/hotel jika Anda memiliki seluruh properti dalam satu kelompok warna (Monopoli). Pembangunan harus merata sesuai aturan.</p>
+                <h5><i class="fa-solid fa-star text-warning me-2"></i>Kuis dan Bintang ⭐</h5>
+                <p class="mb-2">Jika pemain berhenti pada petak bergambar bintang, pemain wajib menjawab soal sesuai tingkat kesulitan petak.</p>
+                <div class="mb-2 ms-2">
+                    <strong class="text-success"><i class="fa-solid fa-circle-check me-1"></i> Jika jawaban benar:</strong>
+                    <p class="mb-1 ms-3">Pemain memperoleh bintang biru sesuai jumlah bintang pada petak:</p>
+                    <ul class="ms-3 list-unstyled">
+                        <li>⭐ (Mudah) &rarr; mendapat <strong>1 bintang biru</strong></li>
+                        <li>⭐⭐ (Sedang) &rarr; mendapat <strong>2 bintang biru</strong></li>
+                        <li>⭐⭐⭐ (Sulit) &rarr; mendapat <strong>3 bintang biru</strong></li>
+                        <li>⭐⭐⭐⭐ (Sangat Sulit) &rarr; mendapat <strong>4 bintang biru</strong></li>
+                    </ul>
+                </div>
+                <div class="ms-2">
+                    <strong class="text-danger"><i class="fa-solid fa-circle-xmark me-1"></i> Jika jawaban salah:</strong>
+                    <p class="mb-0 ms-3">Pemain memperoleh <strong>1 bintang merah</strong>.</p>
+                </div>
             </div>
 
+            <!-- Petak Khusus -->
             <div class="rule-section">
-                <h5><i class="fa-solid fa-triangle-exclamation text-danger me-2"></i>Denda 3x Salah Jawab Soal</h5>
-                <p>Setiap kali Anda menjawab kuis dengan salah, Anda mendapat bintang peringatan. Jika mengumpulkan <strong>3 Bintang Peringatan</strong>, sistem akan mendenda Anda secara otomatis sebesar <strong>Rp 200.000</strong>, lalu bintang peringatan Anda akan di-reset kembali ke nol.</p>
+                <h5><i class="fa-solid fa-layer-group text-info me-2"></i>Petak Khusus</h5>
+                <div class="mb-2">
+                    <h6 class="fw-bold text-danger mb-1"><i class="fa-solid fa-wind me-1"></i> Kartu Peristiwa Alam 🌪️</h6>
+                    <p class="mb-0 ms-2">Kartu yang berisi instruksi atau tantangan yang dapat merugikan pemain, seperti mundur langkah, kehilangan giliran, atau mendapat bintang merah.</p>
+                </div>
+                <div>
+                    <h6 class="fw-bold text-success mb-1"><i class="fa-solid fa-leaf me-1"></i> Kartu Taman Bunga 🌸</h6>
+                    <p class="mb-0 ms-2">Kartu yang berisi instruksi atau hadiah yang menguntungkan pemain, seperti maju langkah, mendapat bintang biru, atau bermain lagi.</p>
+                </div>
+            </div>
+
+            <!-- Monopoli & Keuangan Tambahan -->
+            <div class="rule-section">
+                <h5><i class="fa-solid fa-coins text-warning me-2"></i>Informasi Properti & Keuangan</h5>
+                <ul class="ps-3 mb-0" style="line-height: 1.6;">
+                    <li><strong>Modal Awal:</strong> Setiap pemain memulai dengan modal kas sebesar <strong>Rp 3.000.000</strong>.</li>
+                    <li><strong>Pembangunan:</strong> Anda dapat membangun rumah/hotel jika memiliki seluruh properti dalam satu kelompok warna (Monopoli).</li>
+                    <li><strong>Utang & Gadaian:</strong> Jika kas mencapai nilai negatif, Anda wajib melunasi utang dengan menggadaikan atau menjual aset sebelum mengakhiri giliran.</li>
+                </ul>
             </div>
         </div>
         <div class="custom-modal-footer">
