@@ -5,7 +5,7 @@
  */
 
 // ========== KONFIGURASI UMUM ==========
-$startMoney = 3000;
+$startMoney = 1500;
 
 // ========== PERTANYAAN & SOAL ==========
 $questions = [

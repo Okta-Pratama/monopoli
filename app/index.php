@@ -165,7 +165,7 @@ session_start();
                             <span id="active-badge-<?= $i ?>" class="active-turn-badge d-none">GILIRAN!</span>
                             <span id="jail-badge-<?= $i ?>" class="jail-badge d-none"><i class="fa-solid fa-bars-staggered"></i> JAIL</span>
                         </div>
-                        <div class="player-money" id="money-p<?= $i ?>">Rp 3.000.000</div>
+                        <div class="player-money" id="money-p<?= $i ?>">Rp 1.500.000</div>
                         <div class="stars-row" style="display: flex; gap: 8px; align-items: center; margin-top: 2px;">
                             <div class="star-indicator" id="stars-p<?= $i ?>" title="Bintang Merah (Peringatan)">
                                 <span class="star-empty">☆</span>
@@ -423,7 +423,7 @@ session_start();
                     <button class="cb-dashboard-btn" onclick="showHelpModal()" title="Bantuan & Aturan Main">
                         <i class="fa-solid fa-book-open"></i> Aturan
                     </button>
-                    <button class="cb-dashboard-btn" onclick="Swal.fire({title:'💰 Informasi Bank', html:'<div style=\'font-size:0.95rem; color:#f1f5f9; text-align:left; line-height: 1.6;\'><ul style=\'padding-left:16px; margin:0;\'><li>💰 Modal awal: <b>Rp 3.000.000</b></li><li>🚀 Lewati START: <b>+Rp 200.000</b></li><li>⭐ 3x bintang salah kuis: masuk <b>Penjara</b></li><li>🎲 Dadu 6 di penjara: <b>Bebas!</b></li></ul></div>',icon:'info',confirmButtonText:'Mengerti!',customClass:{popup:'swal-card-stats'}})" title="Informasi Bank & Nilai Awal">
+                    <button class="cb-dashboard-btn" onclick="Swal.fire({title:'💰 Informasi Bank', html:'<div style=\'font-size:0.95rem; color:#f1f5f9; text-align:left; line-height: 1.6;\'><ul style=\'padding-left:16px; margin:0;\'><li>💰 Modal awal: <b>Rp 1.500.000</b></li><li>🚀 Lewati START: <b>+Rp 200.000</b></li><li>⭐ 3x bintang salah kuis: masuk <b>Penjara</b></li><li>🎲 Dadu 6 di penjara: <b>Bebas!</b></li></ul></div>',icon:'info',confirmButtonText:'Mengerti!',customClass:{popup:'swal-card-stats'}})" title="Informasi Bank & Nilai Awal">
                         <i class="fa-solid fa-circle-info"></i> Info Bank
                     </button>
                 </div>
@@ -456,7 +456,7 @@ session_start();
                             <span id="active-badge-<?= $i ?>" class="active-turn-badge d-none">GILIRAN!</span>
                             <span id="jail-badge-<?= $i ?>" class="jail-badge d-none"><i class="fa-solid fa-bars-staggered"></i> JAIL</span>
                         </div>
-                        <div class="player-money" id="money-p<?= $i ?>">Rp 3.000.000</div>
+                        <div class="player-money" id="money-p<?= $i ?>">Rp 1.500.000</div>
                         <div class="stars-row" style="display: flex; gap: 8px; align-items: center; margin-top: 2px;">
                             <div class="star-indicator" id="stars-p<?= $i ?>" title="Bintang Merah (Peringatan)">
                                 <span class="star-empty">☆</span>
@@ -539,7 +539,7 @@ session_start();
             <div class="rule-section">
                 <h5><i class="fa-solid fa-coins text-warning me-2"></i>Informasi Properti & Keuangan</h5>
                 <ul class="ps-3 mb-0" style="line-height: 1.6;">
-                    <li><strong>Modal Awal:</strong> Setiap pemain memulai dengan modal kas sebesar <strong>Rp 3.000.000</strong>.</li>
+                    <li><strong>Modal Awal:</strong> Setiap pemain memulai dengan modal kas sebesar <strong>Rp 1.500.000</strong>.</li>
                     <li><strong>Pembangunan:</strong> Anda dapat membangun rumah/hotel jika memiliki seluruh properti dalam satu kelompok warna (Monopoli).</li>
                     <li><strong>Utang & Gadaian:</strong> Jika kas mencapai nilai negatif, Anda wajib melunasi utang dengan menggadaikan atau menjual aset sebelum mengakhiri giliran.</li>
                 </ul>
