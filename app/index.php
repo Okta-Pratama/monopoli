@@ -110,7 +110,7 @@ session_start();
                 </div>
                 <div>
                     <strong class="text-danger"><i class="fa-solid fa-circle-xmark me-1"></i> Jawaban Salah:</strong>
-                    <p class="mb-0 ms-3">Pemain memperoleh <strong>1 Bintang Merah</strong>. Tidak ada denda uang atau eliminasi.</p>
+                    <p class="mb-0 ms-3">Pemain memperoleh <strong>1 Bintang Merah</strong>.</p>
                 </div>
             </div>
             <!-- Tab 2 content -->
