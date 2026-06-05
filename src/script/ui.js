@@ -9,19 +9,50 @@ let gameTimerInterval;
 let isMuted = false;
 let unreadLogsCount = 0;
 
-function initGameTimer() {
-    gameStartTime = Date.now();
-    clearInterval(gameTimerInterval);
-    gameTimerInterval = setInterval(() => {
-        const diff = Date.now() - gameStartTime;
-        const hrs = Math.floor(diff / 3600000).toString().padStart(2, '0');
-        const mins = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-        const secs = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-        const timerEl = document.getElementById('game-duration');
-        if (timerEl) {
-            timerEl.textContent = `${hrs}:${mins}:${secs}`;
+function togglePauseGame() {
+    isGamePaused = !isGamePaused;
+    const overlay = document.getElementById('pause-overlay');
+    const btn = document.getElementById('btn-pause-toggle');
+    if (isGamePaused) {
+        // Update player info on the pause menu
+        const activePlayerName = document.getElementById('pause-active-player');
+        if (activePlayerName) {
+            const p = players[currentTurn];
+            activePlayerName.textContent = p.name;
+            activePlayerName.className = `status-value text-player-${p.id} fw-bold`;
         }
-    }, 1000);
+
+        overlay.classList.remove('d-none');
+        if (btn) {
+            btn.innerHTML = `<i class="fa-solid fa-play"></i> Resume`;
+            btn.style.color = '#fbbf24';
+        }
+        playSfx(sfx.card);
+    } else {
+        overlay.classList.add('d-none');
+        if (btn) {
+            btn.innerHTML = `<i class="fa-solid fa-pause"></i> Pause`;
+            btn.style.color = '';
+        }
+        playSfx(sfx.card);
+    }
+}
+
+function confirmRestartGame() {
+    Swal.fire({
+        title: 'Mulai Ulang Permainan?',
+        text: "Semua progres permainan saat ini akan hilang!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, Ulangi!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.reload();
+        }
+    });
 }
 
 // Sound Control Interceptor
@@ -101,32 +132,14 @@ function hexToRgb(hex) {
 // ========== AUTO ROLL TIMER — detik ==========
 function startAutoRoll() {
     clearAutoRoll();
-    rollCountdown = 3;
-    updateRollButton();
-    autoRollInterval = setInterval(() => {
-        rollCountdown--;
-        if (rollCountdown > 0) {
-            updateRollButton();
-        } else {
-            clearInterval(autoRollInterval);
-            processTurn();
-        }
-    }, 1000);
 }
 
 function updateRollButton() {
     const btn = document.getElementById('btn-roll');
     if (!btn) return;
-    const isUrgent = rollCountdown <= 10;
-    btn.innerText = `🎲 KOCOK DADU (${rollCountdown}s)`;
-    btn.style.background = isUrgent
-        ? `linear-gradient(135deg, #dc2626, #991b1b)`
-        : `linear-gradient(135deg, #2c3e50, #1a252f)`;
-    if (isUrgent) {
-        btn.classList.add('btn-roll-urgent');
-    } else {
-        btn.classList.remove('btn-roll-urgent');
-    }
+    btn.innerText = `🎲 KOCOK DADU`;
+    btn.style.background = '';
+    btn.classList.remove('btn-roll-urgent');
 }
 
 function clearAutoRoll() {
@@ -148,6 +161,7 @@ function startActionTimer() {
     showActionTimerBar();
 
     actionTimerInterval = setInterval(() => {
+        if (isGamePaused) return;
         actionCountdown--;
         updateActionTimerDisplay();
         if (actionCountdown <= 0) {
@@ -244,19 +258,20 @@ function updateStarIndicator(playerId) {
 }
 
 function initGameTimer() {
-    gameStartTime = Date.now();
     clearInterval(gameTimerInterval);
-    const durationLimit = 15 * 60 * 1000; // 15 minutes in ms
+    gameTimeRemaining = 15 * 60; // 15 minutes in seconds
     gameTimerInterval = setInterval(() => {
-        const elapsed = Date.now() - gameStartTime;
-        const remaining = Math.max(0, durationLimit - elapsed);
-        const mins = Math.floor(remaining / 60000).toString().padStart(2, '0');
-        const secs = Math.floor((remaining % 60000) / 1000).toString().padStart(2, '0');
+        if (isGamePaused) return;
+        gameTimeRemaining--;
+        if (gameTimeRemaining < 0) gameTimeRemaining = 0;
+        
+        const mins = Math.floor(gameTimeRemaining / 60).toString().padStart(2, '0');
+        const secs = (gameTimeRemaining % 60).toString().padStart(2, '0');
         const timerEl = document.getElementById('game-duration');
         if (timerEl) {
             timerEl.textContent = `${mins}:${secs}`;
         }
-        if (remaining <= 0) {
+        if (gameTimeRemaining <= 0) {
             clearInterval(gameTimerInterval);
             endGame();
         }
@@ -351,7 +366,7 @@ function endGame() {
         let netScore = (p.blueStars || 0) - (p.stars || 0);
         return {
             id: p.id,
-            name: `Player ${p.id + 1}`,
+            name: p.name || `Player ${p.id + 1}`,
             blue: p.blueStars || 0,
             red: p.stars || 0,
             net: netScore
@@ -508,6 +523,63 @@ function confirmRulesAndStartCountdown() {
         }, 500);
     }
     
+    // Prompt for player names
+    Swal.fire({
+        title: '✏️ Masukkan Nama Pemain',
+        html: `
+            <div style="text-align: left; font-family: 'Poppins', sans-serif;">
+                <div class="mb-3">
+                    <label class="form-label" style="color:#ef4444; font-weight:bold;"><i class="fa-solid fa-circle text-danger me-2"></i>Pemain 1 (Merah):</label>
+                    <input id="swal-p0-name" class="form-control" value="Player 1" placeholder="Nama Pemain 1" style="background:#1e293b; color:#fff; border:1px solid #ef4444;">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" style="color:#3b82f6; font-weight:bold;"><i class="fa-solid fa-circle text-primary me-2"></i>Pemain 2 (Biru):</label>
+                    <input id="swal-p1-name" class="form-control" value="Player 2" placeholder="Nama Pemain 2" style="background:#1e293b; color:#fff; border:1px solid #3b82f6;">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" style="color:#10b981; font-weight:bold;"><i class="fa-solid fa-circle text-success me-2"></i>Pemain 3 (Hijau):</label>
+                    <input id="swal-p2-name" class="form-control" value="Player 3" placeholder="Nama Pemain 3" style="background:#1e293b; color:#fff; border:1px solid #10b981;">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" style="color:#f59e0b; font-weight:bold;"><i class="fa-solid fa-circle text-warning me-2"></i>Pemain 4 (Kuning):</label>
+                    <input id="swal-p3-name" class="form-control" value="Player 4" placeholder="Nama Pemain 4" style="background:#1e293b; color:#fff; border:1px solid #f59e0b;">
+                </div>
+            </div>
+        `,
+        background: '#0f172a',
+        color: '#f8fafc',
+        confirmButtonText: 'Mulai Main 🚀',
+        confirmButtonColor: '#10b981',
+        allowOutsideClick: false,
+        preConfirm: () => {
+            const p0 = document.getElementById('swal-p0-name').value.trim() || 'Player 1';
+            const p1 = document.getElementById('swal-p1-name').value.trim() || 'Player 2';
+            const p2 = document.getElementById('swal-p2-name').value.trim() || 'Player 3';
+            const p3 = document.getElementById('swal-p3-name').value.trim() || 'Player 4';
+            return [p0, p1, p2, p3];
+        }
+    }).then((res) => {
+        if (res.isConfirmed) {
+            players[0].name = res.value[0];
+            players[1].name = res.value[1];
+            players[2].name = res.value[2];
+            players[3].name = res.value[3];
+            
+            // Update names on the board UI
+            players.forEach(p => {
+                const box = document.getElementById(`ui-p${p.id}`);
+                if (box) {
+                    const nameEl = box.querySelector('.cb-player-name');
+                    if (nameEl) nameEl.textContent = p.name;
+                }
+            });
+            
+            startPawnLoadingAndCountdown(countdownOverlay, countdownNum, countdownTxt);
+        }
+    });
+}
+
+function startPawnLoadingAndCountdown(countdownOverlay, countdownNum, countdownTxt) {
     if (countdownOverlay) {
         countdownOverlay.classList.remove('d-none');
         
@@ -519,7 +591,6 @@ function confirmRulesAndStartCountdown() {
             "Mempersiapkan Papan Statistika..."
         ];
         
-        // Staggered pawn drop in the background during countdown to avoid heavy UI load
         setTimeout(() => {
             const appContainer = document.querySelector('.app-container');
             if (appContainer) appContainer.classList.add('game-started');
@@ -532,9 +603,8 @@ function confirmRulesAndStartCountdown() {
                 playSfx(tickSfx[seconds - 1]);
                 if (countdownNum) {
                     countdownNum.textContent = seconds;
-                    // Reset CSS animation to re-trigger bounce on number change
                     countdownNum.style.animation = 'none';
-                    countdownNum.offsetHeight; /* trigger reflow */
+                    countdownNum.offsetHeight;
                     countdownNum.style.animation = 'countdown-bounce 1s infinite ease-in-out';
                 }
                 if (countdownTxt) countdownTxt.textContent = statusTexts[seconds - 1];
@@ -554,11 +624,7 @@ function confirmRulesAndStartCountdown() {
                 countdownOverlay.style.opacity = '0';
                 setTimeout(() => {
                     countdownOverlay.classList.add('d-none');
-                    
-                    // Re-calculate and lock pawn start positions once layout is 100% stable
                     updatePawnPositions(false);
-                    
-                    // Fire up game timer and auto-roll loops after dramatic loading finishes
                     initGameTimer();
                     if (typeof logGameEvent === 'function') {
                         logGameEvent("Permainan dimulai! Selamat datang di MONIKA (Monopoly Statistika).", "system");

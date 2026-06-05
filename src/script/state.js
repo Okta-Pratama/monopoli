@@ -31,10 +31,10 @@ const pColors = ['text-player-0', 'text-player-1', 'text-player-2', 'text-player
 const pBgSoft = ['#fef2f2', '#eff6ff', '#ecfdf5', '#fffbeb'];
 
 let players = [
-    { id: 0, pos: 0, cards: [], stars: 0, blueStars: 0, isBankrupt: false },
-    { id: 1, pos: 0, cards: [], stars: 0, blueStars: 0, isBankrupt: false },
-    { id: 2, pos: 0, cards: [], stars: 0, blueStars: 0, isBankrupt: false },
-    { id: 3, pos: 0, cards: [], stars: 0, blueStars: 0, isBankrupt: false }
+    { id: 0, name: 'Player 1', pos: 0, cards: [], stars: 0, blueStars: 0, isBankrupt: false },
+    { id: 1, name: 'Player 2', pos: 0, cards: [], stars: 0, blueStars: 0, isBankrupt: false },
+    { id: 2, name: 'Player 3', pos: 0, cards: [], stars: 0, blueStars: 0, isBankrupt: false },
+    { id: 3, name: 'Player 4', pos: 0, cards: [], stars: 0, blueStars: 0, isBankrupt: false }
 ];
 
 let currentTurn = 0;
@@ -48,4 +48,7 @@ let rollCountdown = 3;
 let actionTimerInterval;
 let actionCountdown = ACTION_COUNTDOWN;
 let isActionTimeout = false;
+let isGamePaused = false;
+let gameTimeRemaining = 15 * 60; // 15 minutes in seconds
+
 

@@ -64,7 +64,7 @@ $questions = [
     ],
     'R' => [
         // Level 1
-        ['soal' => 'Tentukan rata-rata dari data: 2, 4, 6, 8 9', 'jawaban_kunci' => 'Rata-rata = 5', 'poin' => 1, 'level' => 1],
+        ['soal' => 'Tentukan rata-rata dari data: 2, 4, 6, 8', 'jawaban_kunci' => 'Rata-rata = 5', 'poin' => 1, 'level' => 1],
         ['soal' => 'Apa yang dimaksud dengan rata-rata?', 'jawaban_kunci' => 'Rata-rata adalah jumlah data dibagi banyak data', 'poin' => 1, 'level' => 1],
         // Level 2
         ['soal' => 'Tentukan rata-rata dari data: 10, 20, 30, 40, 50', 'jawaban_kunci' => 'Rata rata = 30', 'poin' => 1, 'level' => 2],

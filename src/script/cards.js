@@ -98,7 +98,7 @@ function triggerStatsQuestion(p, tileIndex, onComplete) {
                 <hr style="margin-top:15px; margin-bottom:15px; border-top: 2px solid #e74c3c; width: 60%; margin-left: auto; margin-right: auto;">
                 <div style="font-size: 0.8rem; color: #777; margin-bottom: 8px;">Materi: ${getCategoryDisplayName(conf.category)} (Tingkat: ${levelStr})</div>
                 <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;">${q.soal}</div>
-                <div style="font-size: 0.9rem; color: #3b82f6; font-weight: bold;">(Reward: +1 Bintang Biru)</div>
+                <div style="font-size: 0.9rem; color: #3b82f6; font-weight: bold;">(Reward: +${conf.level} Bintang Biru)</div>
                 <div id="swal-action-timer" style="font-size: 1.15rem; font-weight: 900; color: #fbbf24; margin-top: 15px; font-family:'Poppins',sans-serif; text-shadow: 0 0 8px rgba(251,191,36,0.3);">⏱️ 60 detik</div>
             </div>
         `,
@@ -111,14 +111,14 @@ function triggerStatsQuestion(p, tileIndex, onComplete) {
     }).then((res) => {
         if (isActionTimeout) return;
         if (res.value && res.value.toLowerCase().trim() == q.jawaban_kunci.toLowerCase().trim()) {
-            // Jawaban benar — tambah bintang biru
-            p.blueStars = (p.blueStars || 0) + 1;
+            // Jawaban benar — tambah bintang biru sesuai tingkat kesulitan
+            p.blueStars = (p.blueStars || 0) + conf.level;
             updateStarIndicator(p.id);
-            logGameEvent(`Player ${p.id + 1} menjawab kuis Statistika dengan <b>BENAR</b>! (Total Bintang Biru: ${p.blueStars})`, 'statistika', p.id);
+            logGameEvent(`${p.name} menjawab kuis Statistika dengan <b>BENAR</b>! (Total Bintang Biru: ${p.blueStars})`, 'statistika', p.id);
             
             Swal.fire({
                 title: 'Tepat!',
-                html: `<div>Jawaban benar! Anda mendapatkan 1 Bintang Biru.</div>
+                html: `<div>Jawaban benar! Anda mendapatkan ${conf.level} Bintang Biru.</div>
                        <div style="font-size: 1.2rem; margin: 10px 0; color: #3b82f6;"><i class="fa-solid fa-star"></i> Bintang Biru Bertambah!</div>`,
                 icon: 'success',
                 confirmButtonText: 'Lanjutkan'
@@ -128,7 +128,7 @@ function triggerStatsQuestion(p, tileIndex, onComplete) {
             });
         } else {
             // Jawaban salah — tambah bintang merah & cek denda lewat addWarningStars secara silent
-            logGameEvent(`Player ${p.id + 1} menjawab kuis Statistika dengan <b>SALAH</b>! (Jawaban Anda: "${res.value || ''}", Kunci: "${q.jawaban_kunci}")`, 'statistika', p.id);
+            logGameEvent(`${p.name} menjawab kuis Statistika dengan <b>SALAH</b>! (Jawaban Anda: "${res.value || ''}", Kunci: "${q.jawaban_kunci}")`, 'statistika', p.id);
 
             let countdown = 3;
             let countdownInterval;
@@ -249,7 +249,7 @@ function triggerSpecialCardQuiz(p, tileIndex, onComplete) {
                 // Jawaban benar — KARTU BAGUS!
                 p.blueStars = (p.blueStars || 0) + 2;
                 updateStarIndicator(p.id);
-                logGameEvent(`Player ${p.id + 1} menjawab kuis spesial dengan BENAR! Mendapatkan KARTU BAGUS! (Total Bintang Biru: ${p.blueStars})`, 'statistika', p.id);
+                logGameEvent(`${p.name} menjawab kuis spesial dengan BENAR! Mendapatkan KARTU BAGUS! (Total Bintang Biru: ${p.blueStars})`, 'statistika', p.id);
                 
                 Swal.fire({
                     title: '🎉 KARTU BAGUS! (BENAR)',
@@ -267,7 +267,7 @@ function triggerSpecialCardQuiz(p, tileIndex, onComplete) {
                 });
             } else {
                 // Jawaban salah — KARTU JELEK!
-                logGameEvent(`Player ${p.id + 1} menjawab kuis spesial dengan SALAH! Mendapatkan KARTU JELEK!`, 'statistika', p.id);
+                logGameEvent(`${p.name} menjawab kuis spesial dengan SALAH! Mendapatkan KARTU JELEK!`, 'statistika', p.id);
                 
                 let countdown = 3;
                 let countdownInterval;
@@ -360,7 +360,7 @@ function giveStarsToOpponent(p, count) {
     let html = `
         <div style="font-family:'Poppins',sans-serif; text-align:left; font-size:0.95rem; margin-bottom:12px;">Pilih pemain lain untuk diberikan 2 Bintang Peringatan:</div>
         <select id="stars-target-player" class="form-select" style="font-family:'Poppins',sans-serif;">
-            ${opponents.map(x => `<option value="${x.id}">Player ${x.id + 1}</option>`).join('')}
+            ${opponents.map(x => `<option value="${x.id}">${x.name}</option>`).join('')}
         </select>
     `;
     
@@ -377,7 +377,7 @@ function giveStarsToOpponent(p, count) {
         if (res.isConfirmed) {
             let targetId = parseInt(res.value);
             let targetPlayer = players[targetId];
-            logGameEvent(`Player ${p.id + 1} memberikan 2 bintang merah ke Player ${targetId + 1}`, 'system', p.id);
+            logGameEvent(`${p.name} memberikan 2 bintang merah ke ${targetPlayer.name}`, 'system', p.id);
             addWarningStars(targetPlayer, count);
         }
     });
@@ -403,7 +403,7 @@ function teleportOpponentDialog(p, isFront) {
     let html = `
         <div style="font-family:'Poppins',sans-serif; text-align:left; font-size:0.95rem; margin-bottom:8px;">Pilih pemain:</div>
         <select id="teleport-target-player" class="form-select mb-3" style="font-family:'Poppins',sans-serif;">
-            ${opponents.map(x => `<option value="${x.id}">Player ${x.id + 1}</option>`).join('')}
+            ${opponents.map(x => `<option value="${x.id}">${x.name}</option>`).join('')}
         </select>
         <div style="font-family:'Poppins',sans-serif; text-align:left; font-size:0.95rem; margin-bottom:8px;">Pilih petak tujuan (${isFront ? 'di depanmu' : 'di belakangmu'}):</div>
         <select id="teleport-target-tile" class="form-select" style="font-family:'Poppins',sans-serif;">
@@ -427,10 +427,10 @@ function teleportOpponentDialog(p, isFront) {
         if (res.isConfirmed) {
             let targetPlayer = players[res.value.targetPlayerId];
             let tileIdx = res.value.targetTileIdx;
-            logGameEvent(`Player ${p.id + 1} memindahkan Player ${targetPlayer.id + 1} ke petak ${tileIdx} (${BOARD[tileIdx].nama})`, 'system', p.id);
+            logGameEvent(`${p.name} memindahkan ${targetPlayer.name} ke petak ${tileIdx} (${BOARD[tileIdx].nama})`, 'system', p.id);
             
             teleportPlayer(targetPlayer, tileIdx, () => {
-                Swal.fire('Berhasil!', `Player ${targetPlayer.id + 1} telah dipindahkan ke ${BOARD[tileIdx].nama}.`, 'success').then(() => {
+                Swal.fire('Berhasil!', `${targetPlayer.name} telah dipindahkan ke ${BOARD[tileIdx].nama}.`, 'success').then(() => {
                     canEndTurn = true;
                     updateUI();
                 });
@@ -466,7 +466,7 @@ function teleportAndSolveDialog(p, isDoubleReward = false) {
     }).then((res) => {
         if (res.isConfirmed) {
             let tileIdx = res.value;
-            logGameEvent(`Player ${p.id + 1} memilih untuk teleportasi ke petak ${tileIdx} (${BOARD[tileIdx].nama})`, 'system', p.id);
+            logGameEvent(`${p.name} memilih untuk teleportasi ke petak ${tileIdx} (${BOARD[tileIdx].nama})`, 'system', p.id);
             
             teleportPlayer(p, tileIdx, () => {
                 if (isDoubleReward) {
@@ -487,7 +487,7 @@ function teleportAndSolveDialog(p, isDoubleReward = false) {
                                 <hr style="margin-top:15px; margin-bottom:15px; border-top: 2px solid #10b981; width: 60%; margin-left: auto; margin-right: auto;">
                                 <div style="font-size: 0.8rem; color: #777; margin-bottom: 8px;">Materi: ${getCategoryDisplayName(conf.category)} (Tingkat: ${levelStr})</div>
                                 <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;">${q.soal}</div>
-                                <div style="font-size: 0.9rem; color: #10b981; font-weight: bold;">(Reward Ganda: +2 Bintang Biru)</div>
+                                <div style="font-size: 0.9rem; color: #10b981; font-weight: bold;">(Reward Ganda: +${conf.level * 2} Bintang Biru)</div>
                                 <div id="swal-action-timer" style="font-size: 1.15rem; font-weight: 900; color: #fbbf24; margin-top: 15px; font-family:'Poppins',sans-serif; text-shadow: 0 0 8px rgba(251,191,36,0.3);">⏱️ 60 detik</div>
                             </div>
                         `,
@@ -500,20 +500,20 @@ function teleportAndSolveDialog(p, isDoubleReward = false) {
                     }).then((answerRes) => {
                         if (isActionTimeout) return;
                         if (answerRes.value && answerRes.value.toLowerCase().trim() == q.jawaban_kunci.toLowerCase().trim()) {
-                            p.blueStars = (p.blueStars || 0) + 2;
+                            p.blueStars = (p.blueStars || 0) + (conf.level * 2);
                             updateStarIndicator(p.id);
-                            logGameEvent(`Player ${p.id + 1} menjawab kuis bonus dengan BENAR! (Reward Ganda: +2 Bintang Biru, Total Bintang Biru: ${p.blueStars})`, 'statistika', p.id);
+                            logGameEvent(`${p.name} menjawab kuis bonus dengan BENAR! (Reward Ganda: +${conf.level * 2} Bintang Biru, Total Bintang Biru: ${p.blueStars})`, 'statistika', p.id);
                             
                             Swal.fire({
                                 title: 'Luar Biasa!',
-                                text: `Jawaban benar! Anda mendapatkan +2 Bintang Biru.`,
+                                text: `Jawaban benar! Anda mendapatkan +${conf.level * 2} Bintang Biru.`,
                                 icon: 'success',
                                 confirmButtonText: 'Lanjutkan'
                             }).then(() => {
                                 executeActualTileLogic(p, BOARD[tileIdx]);
                             });
                         } else {
-                            logGameEvent(`Player ${p.id + 1} menjawab kuis bonus dengan SALAH! (Jawaban Anda: "${answerRes.value || ''}", Kunci: "${q.jawaban_kunci}")`, 'statistika', p.id);
+                            logGameEvent(`${p.name} menjawab kuis bonus dengan SALAH! (Jawaban Anda: "${answerRes.value || ''}", Kunci: "${q.jawaban_kunci}")`, 'statistika', p.id);
 
                             let countdown = 3;
                             let countdownInterval;
@@ -698,7 +698,7 @@ function drawCard(type, p, onComplete) {
         confirmButtonText: 'Ambil'
     }).then(() => {
         if (isActionTimeout) return;
-        logGameEvent(`Player ${p.id + 1} menarik Kartu <b>${cardDetails.title}</b>: "${cardDetails.text}"`, 'card', p.id);
+        logGameEvent(`${p.name} menarik Kartu <b>${cardDetails.title}</b>: "${cardDetails.text}"`, 'card', p.id);
         
         let isAsyncAction = false;
         if (isTaman) {

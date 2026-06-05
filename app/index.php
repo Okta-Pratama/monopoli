@@ -94,7 +94,7 @@ session_start();
                 <ol class="ps-3 mb-0" style="line-height: 1.6;">
                     <li class="mb-2">Lempar dadu dan maju sesuai angka.</li>
                     <li class="mb-2">Jika berhenti di petak kuis, jawab soal yang diberikan.</li>
-                    <li class="mb-2">Jawaban benar mendapat <strong class="text-primary">1 Bintang Biru <i class="fa-solid fa-star text-primary"></i></strong>.</li>
+                    <li class="mb-2">Jawaban benar mendapat <strong class="text-primary">Bintang Biru sesuai tingkat kesulitan kuis <i class="fa-solid fa-star text-primary"></i></strong> (misal kesulitan 3 ⭐ mendapatkan 3 Bintang Biru).</li>
                     <li class="mb-2">Jawaban salah mendapat <strong class="text-danger">1 Bintang Merah <i class="fa-solid fa-star text-danger"></i></strong>.</li>
                     <li class="mb-2">Permainan dibatasi durasi maksimal 15 menit.</li>
                     <li class="mb-2">Pemenang ditentukan berdasarkan skor tertinggi: <strong class="text-primary">Bintang Biru</strong> dikurangi <strong class="text-danger">Bintang Merah</strong>.</li>
@@ -106,7 +106,7 @@ session_start();
                 <p>Setiap petak kuis berisikan kode soal dan tingkat kesulitan (ditunjukkan dengan jumlah bintang pada petak).</p>
                 <div class="mb-3">
                     <strong class="text-success"><i class="fa-solid fa-circle-check me-1"></i> Jawaban Benar:</strong>
-                    <p class="mb-1 ms-3">Pemain memperoleh <strong>1 Bintang Biru</strong>.</p>
+                    <p class="mb-1 ms-3">Pemain memperoleh <strong>Bintang Biru sesuai tingkat kesulitan kuis</strong> (1 hingga 4 Bintang Biru).</p>
                 </div>
                 <div>
                     <strong class="text-danger"><i class="fa-solid fa-circle-xmark me-1"></i> Jawaban Salah:</strong>
@@ -141,6 +141,39 @@ session_start();
     <div class="countdown-ring"></div>
     <div id="countdown-number" class="countdown-number">3</div>
     <div id="countdown-text" class="countdown-text">Mempersiapkan Papan Permainan...</div>
+</div>
+
+<!-- ===== PAUSE OVERLAY ===== -->
+<div id="pause-overlay" class="pause-overlay d-none">
+    <div class="pause-menu animate__animated animate__zoomIn">
+        <div class="pause-header">
+            <div class="pause-glow-ring">
+                <i class="fa-solid fa-pause"></i>
+            </div>
+            <h2>PAUSE MENU</h2>
+            <div class="pause-divider"></div>
+        </div>
+        
+        <div class="pause-status-box">
+            <span class="status-label">GILIRAN SAAT INI</span>
+            <span id="pause-active-player" class="status-value text-player-0">PLAYER 1</span>
+        </div>
+
+        <div class="pause-actions">
+            <button class="pause-btn btn-resume-game" onclick="togglePauseGame()">
+                <i class="fa-solid fa-play"></i>
+                <span>LANJUTKAN</span>
+            </button>
+            <button class="pause-btn btn-rules-game" onclick="togglePauseGame(); showHelpModal();">
+                <i class="fa-solid fa-book-open"></i>
+                <span>ATURAN MAIN</span>
+            </button>
+            <button class="pause-btn btn-restart-game" onclick="confirmRestartGame()">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>MULAI ULANG</span>
+            </button>
+        </div>
+    </div>
 </div>
 
 <div class="app-container">
@@ -371,10 +404,13 @@ session_start();
                     <button id="btn-sound-toggle" class="cb-dashboard-btn" onclick="toggleMute()" title="Mute/Unmute Suara">
                         <i class="fa-solid fa-volume-high"></i>
                     </button>
+                    <button id="btn-pause-toggle" class="cb-dashboard-btn" onclick="togglePauseGame()" title="Pause/Resume Game">
+                        <i class="fa-solid fa-pause"></i> Pause
+                    </button>
                     <button class="cb-dashboard-btn" onclick="showHelpModal()" title="Bantuan & Aturan Main">
                         <i class="fa-solid fa-book-open"></i> Aturan
                     </button>
-                    <button class="cb-dashboard-btn" onclick="Swal.fire({title:'⭐ Sistem Poin', html:'<div style=\'font-size:0.95rem; color:#f1f5f9; text-align:left; line-height: 1.6;\'><ul style=\'padding-left:16px; margin:0;\'><li>✔️ <b>Jawaban Benar:</b> Mendapatkan 1 Bintang Biru</li><li>❌ <b>Jawaban Salah:</b> Mendapatkan 1 Bintang Merah</li><li>⏱️ <b>Durasi Game:</b> Maksimal 15 Menit</li><li>🏆 <b>Skor Akhir:</b> Bintang Biru - Bintang Merah</li></ul></div>',icon:'info',confirmButtonText:'Mengerti!',customClass:{popup:'swal-card-stats'}})" title="Informasi Sistem Poin">
+                    <button class="cb-dashboard-btn" onclick="Swal.fire({title:'⭐ Sistem Poin', html:'<div style=\'font-size:0.95rem; color:#f1f5f9; text-align:left; line-height: 1.6;\'><ul style=\'padding-left:16px; margin:0;\'><li>✔️ <b>Jawaban Benar:</b> Mendapatkan Bintang Biru sesuai tingkat kesulitan kuis (1-4)</li><li>❌ <b>Jawaban Salah:</b> Mendapatkan 1 Bintang Merah</li><li>⏱️ <b>Durasi Game:</b> Mendapatkan 15 Menit Maksimal</li><li>🏆 <b>Skor Akhir:</b> Bintang Biru - Bintang Merah</li></ul></div>',icon:'info',confirmButtonText:'Mengerti!',customClass:{popup:'swal-card-stats'}})" title="Informasi Sistem Poin">
                         <i class="fa-solid fa-circle-info"></i> Sistem Poin
                     </button>
                 </div>
@@ -409,7 +445,7 @@ session_start();
                 <ol class="ps-3 mb-0" style="line-height: 1.6;">
                     <li class="mb-1">Lempar dadu dan maju sesuai angka.</li>
                     <li class="mb-1">Jika berhenti di petak kuis, jawab soal yang diberikan.</li>
-                    <li class="mb-1">Jawaban benar mendapat <strong class="text-primary">1 Bintang Biru <i class="fa-solid fa-star text-primary"></i></strong>.</li>
+                    <li class="mb-1">Jawaban benar mendapat <strong class="text-primary">Bintang Biru sesuai tingkat kesulitan kuis <i class="fa-solid fa-star text-primary"></i></strong> (misal kesulitan 3 ⭐ mendapatkan 3 Bintang Biru).</li>
                     <li class="mb-1">Jawaban salah mendapat <strong class="text-danger">1 Bintang Merah <i class="fa-solid fa-star text-danger"></i></strong>.</li>
                     <li class="mb-1">Permainan dibatasi durasi maksimal 15 menit.</li>
                     <li class="mb-1">Pemenang ditentukan berdasarkan skor tertinggi: <strong class="text-primary">Bintang Biru</strong> dikurangi <strong class="text-danger">Bintang Merah</strong>.</li>
@@ -422,7 +458,7 @@ session_start();
                 <p class="mb-2">Setiap petak kuis berisikan kode soal dan tingkat kesulitan (mudah ⭐ hingga sangat sulit ⭐⭐⭐⭐).</p>
                 <div class="mb-2 ms-2">
                     <strong class="text-success"><i class="fa-solid fa-circle-check me-1"></i> Jawaban Benar:</strong>
-                    <p class="mb-1 ms-3">Pemain memperoleh <strong>1 Bintang Biru</strong>.</p>
+                    <p class="mb-1 ms-3">Pemain memperoleh <strong>Bintang Biru sesuai tingkat kesulitan kuis</strong> (1 hingga 4 Bintang Biru).</p>
                 </div>
                 <div class="ms-2">
                     <strong class="text-danger"><i class="fa-solid fa-circle-xmark me-1"></i> Jawaban Salah:</strong>

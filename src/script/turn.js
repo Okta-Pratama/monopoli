@@ -25,7 +25,7 @@ function rollAndMove(p) {
             clearInterval(rollInterval);
             let finalDice = Math.floor(Math.random() * 6) + 1;
             diceIcon.className = `fa-solid ${dCls[finalDice - 1]} cb-dice-icon ${pColors[p.id]} animate__animated animate__bounceIn`;
-            logGameEvent(`Player ${p.id + 1} mengocok dadu dan mendapat angka <b>${finalDice}</b>.`, 'dice', p.id);
+            logGameEvent(`${p.name} mengocok dadu dan mendapat angka <b>${finalDice}</b>.`, 'dice', p.id);
 
             let step = 0;
             let stepInterval = setInterval(() => {
@@ -132,7 +132,7 @@ function endTurn() {
     let p = players[currentTurn];
     if (p.extraTurn && !p.isBankrupt) {
         p.extraTurn = false; // Reset flag
-        logGameEvent(`Player ${p.id + 1} mendapatkan Bonus Jalan 2x!`, 'system', p.id);
+        logGameEvent(`${p.name} mendapatkan Bonus Jalan 2x!`, 'system', p.id);
         
         hasRolled = false;
         canEndTurn = false;
@@ -159,11 +159,11 @@ function endTurn() {
         
         if (players[currentTurn].skipNextTurn && !players[currentTurn].isBankrupt) {
             players[currentTurn].skipNextTurn = false; // Reset flag
-            logGameEvent(`Giliran Player ${currentTurn + 1} dilewati karena efek Kartu Bencana Alam!`, 'system', currentTurn);
+            logGameEvent(`Giliran ${players[currentTurn].name} dilewati karena efek Kartu Bencana Alam!`, 'system', currentTurn);
             Swal.fire({
                 toast: true,
                 position: 'top-end',
-                title: `🔇 Player ${currentTurn + 1} Lewat Giliran!`,
+                title: `🔇 ${players[currentTurn].name} Lewat Giliran!`,
                 icon: 'warning',
                 showConfirmButton: false,
                 timer: 3000
@@ -176,7 +176,7 @@ function endTurn() {
     } while (loopCount < 8);
 
     document.getElementById(`ui-p${currentTurn}`).classList.add('active-turn');
-    document.getElementById('turn-indicator').innerText = `GILIRAN PLAYER ${currentTurn + 1}`;
+    document.getElementById('turn-indicator').innerText = `GILIRAN ${players[currentTurn].name.toUpperCase()}`;
     document.getElementById('turn-indicator').className = `turn-indicator-text fw-bold mb-1 ${pColors[currentTurn]}`;
 
     hasRolled = false;
@@ -186,28 +186,13 @@ function endTurn() {
     const playerIcons = ['fa-chess-pawn', 'fa-chess-knight', 'fa-chess-rook', 'fa-chess-queen'];
     const playerColorNames = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b'];
 
-    let countdown = 3;
-    let countdownInterval;
     Swal.fire({
-        title: `<i class="fa-solid ${playerIcons[currentTurn]}" style="color:${playerColorNames[currentTurn]}; font-size:2rem;"></i><br><span style="color:${playerColorNames[currentTurn]}; font-size:1.3rem;">Giliran Player ${currentTurn + 1}!</span>`,
-        html: `<div style="padding:10px 0; color:#555;">Bersiap dalam <b id="swal-countdown">${countdown}</b> detik...</div>`,
+        title: `<i class="fa-solid ${playerIcons[currentTurn]}" style="color:${playerColorNames[currentTurn]}; font-size:2rem;"></i><br><span style="color:${playerColorNames[currentTurn]}; font-size:1.3rem;">Giliran ${players[currentTurn].name}!</span>`,
+        html: `<div style="padding:10px 0; color:#555;">Silakan lempar dadu untuk memulai giliran Anda.</div>`,
         background: pBgSoft[currentTurn],
         allowOutsideClick: false,
         showConfirmButton: true,
-        confirmButtonText: 'Mulai Main',
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: () => {
-            const countdownEl = document.getElementById('swal-countdown');
-            countdownInterval = setInterval(() => {
-                countdown--;
-                if (countdownEl) countdownEl.textContent = countdown;
-                if (countdown <= 0) clearInterval(countdownInterval);
-            }, 1000);
-        },
-        willClose: () => {
-            clearInterval(countdownInterval);
-        }
+        confirmButtonText: 'Mulai Giliran'
     }).then(() => {
         startAutoRoll();
     });

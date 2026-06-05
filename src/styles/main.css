@@ -2338,3 +2338,190 @@ body{background:radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);font
   }
 }
 
+/* ===== PREMIUM GAME PAUSE OVERLAY ===== */
+.pause-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(10, 15, 30, 0.85);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.pause-menu {
+  background: rgba(15, 23, 42, 0.95);
+  border: 2px solid rgba(251, 191, 36, 0.8);
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.8),
+    0 0 30px rgba(251, 191, 36, 0.2),
+    inset 0 0 20px rgba(251, 191, 36, 0.05);
+  border-radius: 28px;
+  padding: 35px;
+  width: 380px;
+  max-width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #f8fafc;
+  font-family: 'Poppins', sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Pause Header */
+.pause-header {
+  text-align: center;
+  width: 100%;
+  margin-bottom: 25px;
+}
+
+.pause-glow-ring {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: rgba(251, 191, 36, 0.1);
+  border: 2.5px solid #fbbf24;
+  box-shadow: 
+    0 0 15px rgba(251, 191, 36, 0.5),
+    inset 0 0 10px rgba(251, 191, 36, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px;
+  animation: pulse-ring 2s infinite ease-in-out;
+}
+
+.pause-glow-ring i {
+  font-size: 2rem;
+  color: #fbbf24;
+  filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.6));
+}
+
+@keyframes pulse-ring {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(251, 191, 36, 0.5); }
+  50% { transform: scale(1.06); box-shadow: 0 0 25px rgba(251, 191, 36, 0.8); }
+}
+
+.pause-header h2 {
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+  margin: 0 0 12px;
+  background: linear-gradient(135deg, #f8fafc, #fbbf24);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.pause-divider {
+  width: 60px;
+  height: 3px;
+  background: #fbbf24;
+  border-radius: 2px;
+  margin: 0 auto;
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+}
+
+/* Status Box */
+.pause-status-box {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 12px 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 28px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.status-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.status-value {
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Action Buttons */
+.pause-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.pause-btn {
+  width: 100%;
+  padding: 14px 24px;
+  border-radius: 16px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+  color: #ffffff;
+}
+
+.pause-btn i {
+  font-size: 1.1rem;
+  width: 20px;
+  text-align: center;
+}
+
+/* Hover effects */
+.btn-resume-game {
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.255);
+  border: none;
+}
+.btn-resume-game:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45), 0 0 10px rgba(16, 185, 129, 0.2);
+  filter: brightness(1.1);
+}
+
+.btn-rules-game {
+  background: rgba(30, 41, 59, 0.65);
+}
+.btn-rules-game:hover {
+  transform: translateY(-2px);
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.5);
+  color: #38bdf8;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.15);
+}
+
+.btn-restart-game {
+  background: rgba(30, 41, 59, 0.65);
+}
+.btn-restart-game:hover {
+  transform: translateY(-2px);
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #f87171;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.15);
+}
+
+.pause-btn:active {
+  transform: translateY(0);
+}
+
