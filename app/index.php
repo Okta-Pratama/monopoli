@@ -70,7 +70,7 @@ session_start();
         
         <div class="intro-creators-capsule">
             <span class="label">DEVELOPMENT TEAM</span>
-            <span class="name">Kelompok 2 media pembelajaran kelas A</span>
+            <span class="name">Kelompok 2 media pembelajaran kelas A, Angkatan 2025</span>
         </div>
         
         <button id="btn-start-game" class="intro-start-btn" onclick="startGameWithIntro()">
